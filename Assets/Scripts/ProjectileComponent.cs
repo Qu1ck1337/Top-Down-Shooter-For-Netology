@@ -6,8 +6,9 @@ public class ProjectileComponent : MonoBehaviour
 {
     [SerializeField]
     private float _speed;
-
     [SerializeField]
+    private int _damage;
+
     private bool _isMoving = false;
 
     public void SetMoving(bool status) => _isMoving = status;
@@ -16,5 +17,14 @@ public class ProjectileComponent : MonoBehaviour
     {
         if (_isMoving)
             transform.Translate(Vector3.forward * _speed * Time.deltaTime);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        UnitComponent unit = other.GetComponent<UnitComponent>();
+        if (unit != null)
+        {
+            unit.ReduceHealthAndKill(_damage);
+        }
     }
 }

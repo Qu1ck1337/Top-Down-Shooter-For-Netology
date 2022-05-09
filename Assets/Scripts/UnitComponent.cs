@@ -10,4 +10,13 @@ public class UnitComponent : MonoBehaviour
     protected float _MovementSpeed;
     [SerializeField]
     protected WeaponComponent _weapon;
+
+    public void ReduceHealthAndKill(int reduce)
+    {
+        _health -= reduce;
+        if (_health <= 0)
+        {
+            Destroy(this.gameObject);
+        }
+    }
 }
