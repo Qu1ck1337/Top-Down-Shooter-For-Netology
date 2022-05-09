@@ -90,6 +90,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec881813caa2f8248b15296be2bae304, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _projectile: {fileID: 2079720962418853582, guid: acd3bc3bc973c9a40b6a3051f4f19b00, type: 3}
-  _projectileDelay: 1
+  _projectile: {fileID: 4980066090341991483, guid: acd3bc3bc973c9a40b6a3051f4f19b00, type: 3}
+  _projectileDelay: 0.1
   _projectileDeviation: 0

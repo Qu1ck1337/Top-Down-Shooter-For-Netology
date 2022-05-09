@@ -11,8 +11,14 @@ public class WeaponComponent : MonoBehaviour
     [SerializeField, Range(0f, 1f)]
     protected float _projectileDeviation;
 
+    protected ProjectilePool _projectilePool;
     protected bool _isShootState = true;
     protected float _timer;
+
+    private void Start()
+    {
+        _projectilePool = FindObjectOfType<ProjectilePool>();
+    }
 
     private void Update()
     {
