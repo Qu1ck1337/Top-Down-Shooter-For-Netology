@@ -25,15 +25,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8f9696fb6017be144a307b6586855ac0, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -2.121577
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8f9696fb6017be144a307b6586855ac0, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 1.39
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8f9696fb6017be144a307b6586855ac0, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -5.8108993
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8f9696fb6017be144a307b6586855ac0, type: 3}
       propertyPath: m_LocalRotation.w
@@ -93,3 +93,11 @@ MonoBehaviour:
   _projectile: {fileID: 4980066090341991483, guid: acd3bc3bc973c9a40b6a3051f4f19b00, type: 3}
   _projectileDelay: 0.1
   _projectileDeviation: 0
+  _weaponType: 0
+  _radiusToFire: 5
+  _showFireRadiusGizmos: 0
+  _allAmmo: 28
+  _ammoInStore: 7
+  _reloadTime: 3
+  _currentAllAmmo: 0
+  _currentAmmoInStore: 0

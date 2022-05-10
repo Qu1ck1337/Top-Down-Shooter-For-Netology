@@ -7,7 +7,7 @@ public class UnitComponent : MonoBehaviour
     [SerializeField, Range(0, 100)]
     protected int _health;
     [SerializeField, Range(0f, 100f)]
-    protected float _MovementSpeed;
+    protected float _movementSpeed;
     [SerializeField]
     protected WeaponComponent _weapon;
 

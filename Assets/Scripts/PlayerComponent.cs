@@ -32,7 +32,7 @@ public class PlayerComponent : UnitComponent
     private void MovementLogic()
     {
         Vector2 direction = _controls.Player.Movement.ReadValue<Vector2>();
-        transform.position += new Vector3(direction.x, 0f, direction.y) * _MovementSpeed * Time.deltaTime;
+        transform.position += new Vector3(direction.x, 0f, direction.y) * _movementSpeed * Time.deltaTime;
     }
 
     private float _angleY;
