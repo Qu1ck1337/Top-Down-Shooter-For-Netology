@@ -136,5 +136,5 @@ MonoBehaviour:
   _timeToStayAtPatrollPointMin: 1
   _checkGizmos: 0
   _checkPistolPoint: 1
-  _pointForPistol: {x: 0.7, y: 0.39, z: 0}
+  _pointForPistol: {x: 0, y: 0.39, z: 0.81}
   _enemyCooldownAfterFire: 2

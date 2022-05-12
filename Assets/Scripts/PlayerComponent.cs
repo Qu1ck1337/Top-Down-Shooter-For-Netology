@@ -6,11 +6,16 @@ using UnityEngine.InputSystem;
 
 public class PlayerComponent : UnitComponent
 {
-    PlayerControls _controls;
+    private PlayerControls _controls;
+    [SerializeField]
+    private Animator _animator;
+    
+    private Rigidbody _rigidBody;
 
     private void Awake()
     {
         _controls = new PlayerControls();
+        _rigidBody = GetComponent<Rigidbody>();
     }
 
     private void OnEnable()
@@ -20,8 +25,12 @@ public class PlayerComponent : UnitComponent
 
     private void Update()
     {
-        MovementLogic();
         RotationLogic();
+    }
+
+    private void FixedUpdate()
+    {
+        MovementLogic();
     }
 
     private void Start()
@@ -32,7 +41,13 @@ public class PlayerComponent : UnitComponent
     private void MovementLogic()
     {
         Vector2 direction = _controls.Player.Movement.ReadValue<Vector2>();
-        transform.position += new Vector3(direction.x, 0f, direction.y) * _movementSpeed * Time.deltaTime;
+        _rigidBody.AddForce(new Vector3(direction.x, 0, direction.y) * _movementSpeed * Time.fixedDeltaTime, ForceMode.VelocityChange);
+        //_rigidBody.velocity = Vector3.ClampMagnitude(_rigidBody.velocity, _movementSpeed);
+        //transform.position += new Vector3(direction.x, 0f, direction.y) * _movementSpeed * Time.deltaTime;
+        if (_rigidBody.velocity.magnitude >= _maxVelocity)
+        {
+            _rigidBody.velocity = _rigidBody.velocity.normalized * _maxVelocity;
+        }
     }
 
     private float _angleY;
@@ -51,7 +66,13 @@ public class PlayerComponent : UnitComponent
 
     private void FireLogic(InputAction.CallbackContext context)
     {
-        _weapon.checkAndFire();
+        if (_weapon != null)
+            _weapon.checkAndFire();
+        else
+        {
+            _animator.SetTrigger("HandAttack");
+        }
+
     }
 
 

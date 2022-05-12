@@ -96,6 +96,7 @@ public class EnemyComponent : UnitComponent
 
     private void PlayerIdentification()
     {
+        if (_player == null) return;
         if (Vector3.Distance(transform.position, _player.position) <= _playerIdentificationRadius)
         {
             _target = _player;
@@ -155,7 +156,7 @@ public class EnemyComponent : UnitComponent
     private IEnumerator EnemyMoveCooldown()
     {
         yield return new WaitForSeconds(_enemyCooldownAfterFire);
-        if (_weapon.CurrentAllAmmo > 0 && _weapon.CurrentAmmoInStore > 0)
+        if (_weapon.CurrentAllAmmo > 0 || _weapon.CurrentAmmoInStore > 0)
             _inCooldown = false;
     }
 }
