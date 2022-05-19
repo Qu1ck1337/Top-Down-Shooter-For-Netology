@@ -96,8 +96,8 @@ MonoBehaviour:
   _weaponType: 0
   _radiusToFire: 5
   _showFireRadiusGizmos: 0
-  _allAmmo: 28
-  _ammoInStore: 7
+  _allAmmo: 27
+  _ammoInStore: 1
   _reloadTime: 3
   _currentAllAmmo: 0
   _currentAmmoInStore: 0

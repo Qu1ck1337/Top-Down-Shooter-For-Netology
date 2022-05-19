@@ -9,6 +9,8 @@ public class ProjectileComponent : MonoBehaviour
     [SerializeField]
     private int _damage;
 
+    public UnitComponent Owner;
+
     private bool _isMoving = false;
 
     public void SetMoving(bool status) => _isMoving = status;

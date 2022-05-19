@@ -1,162 +1,157 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EnemyComponent : UnitComponent
 {
     [SerializeField]
+    private Vector3 _weaponSpawn;
+    [Space, SerializeField, Range(0f, 100f)]
     private float _playerIdentificationRadius;
-    [SerializeField]
-    private float _fieldOfView;
+
+    public float GetPlayerIdentificationRadius => _playerIdentificationRadius;
+
+    [SerializeField, Range(0f, 100f)]
+    private float _radiusOfEnemyView;
 
     [Space, SerializeField]
-    private Vector3[] _queuePointsForPatrolling;
+    private float _delayTimeAfterFire;
+
+    [SerializeField, Space]
+    private Vector3[] _patrollingPoints;
+    private int _currentPartollingPointIndex;
     [SerializeField]
-    private float _timeToStayAtPatrollPointMax;
+    private float _stayOnRadiusPatrollingPoint;
     [SerializeField]
-    private float _timeToStayAtPatrollPointMin;
+    private float _delayStayingOnPoint;
+    [SerializeField]
+    private float _delayStayingOnPointOffset;
 
     [Space, SerializeField]
-    private bool _checkGizmos;
+    private float _pursuitSpeed;
 
-    [Space, SerializeField]
-    private bool _checkPistolPoint;
-    [SerializeField]
-    private Vector3 _pointForPistol;
-
-    [Space, SerializeField]
-    private float _enemyCooldownAfterFire;
-
-    private Vector3 _nextPatrollingPoint;
-    private bool _isStayingAtPoint;
-    private Queue<Vector3> _pointsForPatrolling = new Queue<Vector3>();
-    private Transform _player;
     private Transform _target;
-    private bool _inCooldown;
+    private NavMeshAgent _agent;
+
+    private ProjectilePool _projectilePool;
+
+    public Enums.EnemyStateType StateType { get; private set; } = Enums.EnemyStateType.Idle;
 
     private void Start()
     {
-        if (_weapon != null)
+        _weapon = Instantiate(_weapon, transform);
+        _weapon.transform.position = _weaponSpawn + transform.position;
+        _agent = GetComponent<NavMeshAgent>();
+        _target = FindObjectOfType<PlayerComponent>().gameObject.transform;
+        _projectilePool = FindObjectOfType<ProjectilePool>();
+        if (_patrollingPoints.Length > 0) StateType = Enums.EnemyStateType.Patrolling;
+        else
         {
-            var weapon = Instantiate(_weapon, transform);
-            switch (_weapon.GetWeaponType())
-            {
-                case Enums.WeaponType.Pistol:
-                    weapon.transform.position = _pointForPistol + transform.position;
-                    break;
-            }
-            _weapon = weapon;
+            Vector3[] _patrollingPointsNew = new Vector3[1];
+            _patrollingPointsNew[0] = transform.position;
+            _patrollingPoints = _patrollingPointsNew;
         }
-
-        _player = FindObjectOfType<PlayerComponent>().GetComponent<Transform>();
-        foreach (Vector3 point in _queuePointsForPatrolling)
-        {
-            _pointsForPatrolling.Enqueue(point);
-        }
-        _pointsForPatrolling.Enqueue(transform.position);
-        _nextPatrollingPoint = _pointsForPatrolling.Dequeue();
-        _pointsForPatrolling.Enqueue(_nextPatrollingPoint);
     }
 
     private void Update()
     {
-        FolowingLogic();
-        PlayerIdentification();
-        RayDetection();
-        FireLogic();
+        TargetDetection();
+        if (!_isMoving) return;
+        UpdateStatus();
     }
 
-    private IEnumerator ChangePatrollingPoint()
+    private bool _isMovingOnPatrolling = true;
+    private bool _isMoving = true;
+    private void UpdateStatus()
     {
-        yield return new WaitForSeconds(Random.Range(_timeToStayAtPatrollPointMin, _timeToStayAtPatrollPointMax));
-        _nextPatrollingPoint = _pointsForPatrolling.Dequeue();
-        _pointsForPatrolling.Enqueue(_nextPatrollingPoint);
-        _isStayingAtPoint = false;
-    }
-
-    private void FolowingLogic()
-    {
-        if (_inCooldown) return;
-        if (_target == null)
+        switch (StateType)
         {
-            transform.position = Vector3.MoveTowards(transform.position, new Vector3(_nextPatrollingPoint.x, transform.position.y, _nextPatrollingPoint.z), _movementSpeed * Time.deltaTime);
-            transform.LookAt(new Vector3(_nextPatrollingPoint.x, transform.position.y, _nextPatrollingPoint.z));
-            if (Vector3.Distance(transform.position, new Vector3(_nextPatrollingPoint.x, transform.position.y, _nextPatrollingPoint.z)) < 0.2f && !_isStayingAtPoint)
-            {
-                StartCoroutine(ChangePatrollingPoint());
-                _isStayingAtPoint = true;
-            }
-        }
-        else
-        {
-            transform.position = Vector3.MoveTowards(transform.position, _target.position, _movementSpeed * Time.deltaTime);
-            transform.LookAt(new Vector3(_target.position.x, transform.position.y, _target.position.z));
-        }
-    }
-
-    private void PlayerIdentification()
-    {
-        if (_player == null) return;
-        if (Vector3.Distance(transform.position, _player.position) <= _playerIdentificationRadius)
-        {
-            _target = _player;
-        }
-        else if (Vector3.Distance(transform.position, _player.position) > _fieldOfView)
-        {
-            _target = null;
-        }
-    }
-
-    private void RayDetection()
-    {
-        RaycastHit hit;
-        Ray ray = new Ray(transform.position, transform.forward);
-        Physics.Raycast(ray, out hit);
-
-        if (hit.collider != null && hit.collider.gameObject.GetComponent<PlayerComponent>())
-        {
-            _target = _player;
-        }
-    }
-
-    private void OnDrawGizmos()
-    {   
-        if (_checkGizmos)
-        {
-            foreach (Vector3 point in _queuePointsForPatrolling)
-            {
-                Gizmos.color = Color.green;
-                Gizmos.DrawSphere(point, 0.5f);
-            }
-
-            Gizmos.color = Color.red;
-            Gizmos.DrawSphere(transform.position, _playerIdentificationRadius);
-
-            Gizmos.color = Color.blue;
-            Gizmos.DrawSphere(transform.position, _fieldOfView);
-        }
-        if (_checkPistolPoint)
-        {
-            Gizmos.color = Color.green;
-            Gizmos.DrawSphere(_pointForPistol + transform.position, 0.1f);
+            case Enums.EnemyStateType.Idle:
+                _agent.destination = transform.position;
+                break;
+            case Enums.EnemyStateType.Patrolling:
+                if (!_isMovingOnPatrolling) return;
+                var ind = _currentPartollingPointIndex % _patrollingPoints.Length;
+                _agent.destination = _patrollingPoints[ind];
+                if (Vector3.Distance(new Vector3(_patrollingPoints[ind].x, transform.position.y, _patrollingPoints[ind].z), transform.position) < _stayOnRadiusPatrollingPoint)
+                {
+                    _isMovingOnPatrolling = false;
+                    StartCoroutine(ChangePatrollingPoint());
+                }
+                break;
+            case Enums.EnemyStateType.Pursuit:
+                _agent.destination = _target.position;
+                _agent.speed = _pursuitSpeed;
+                FireLogic();
+                break;
         }
     }
 
     private void FireLogic()
     {
-        if (_inCooldown || _target == null) return;
-        if (Vector3.Distance(transform.position, _target.position) <= _weapon.GetRadiusToFire())
+        RaycastHit hit;
+        Physics.Raycast(_weapon.transform.position, _weapon.transform.forward, out hit);
+        if (Vector3.Distance(transform.position, _target.position) < _weapon.GetRadiusToFire() && hit.collider != null && hit.collider.GetComponent<PlayerComponent>() != null)
         {
             _weapon.checkAndFire();
-            StartCoroutine(EnemyMoveCooldown());
-            _inCooldown = true;
+            _isMoving = false;
+            StartCoroutine(StopEnemyAfterFire());
         }
     }
 
-    private IEnumerator EnemyMoveCooldown()
+    private IEnumerator StopEnemyAfterFire()
     {
-        yield return new WaitForSeconds(_enemyCooldownAfterFire);
-        if (_weapon.CurrentAllAmmo > 0 || _weapon.CurrentAmmoInStore > 0)
-            _inCooldown = false;
+        _agent.destination = transform.position;
+        yield return new WaitForSeconds(_delayTimeAfterFire);
+        if (!(_weapon.CurrentAllAmmo <= 0 && _weapon.CurrentAmmoInStore <= 0))
+            _isMoving = true;
+    }
+
+    private void TargetDetection()
+    {
+        if (Vector3.Distance(transform.position, _target.position) < _playerIdentificationRadius || Vector3.Distance(transform.position, _target.position) < _radiusOfEnemyView && IsAnyBulletsAround())
+        {
+            StateType = Enums.EnemyStateType.Pursuit;
+        }
+        else if (Vector3.Distance(transform.position, _target.position) >= _radiusOfEnemyView)
+        {
+            StateType = Enums.EnemyStateType.Patrolling;
+        }
+    }
+
+    private IEnumerator ChangePatrollingPoint() 
+    {
+        yield return new WaitForSeconds(Mathf.Clamp(_delayStayingOnPoint + UnityEngine.Random.Range(-_delayStayingOnPointOffset, _delayStayingOnPointOffset), 0f, float.MaxValue));
+        _currentPartollingPointIndex += 1;
+        _isMovingOnPatrolling = true;
+    }
+
+    private bool IsAnyBulletsAround()
+    {
+        var projectile = _projectilePool.GetNearestProjectileInEnemyRadius(this);
+        if (projectile != null && projectile.Owner is PlayerComponent)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        foreach (var point in _patrollingPoints)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawSphere(point, 1f);
+        }
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(transform.position, _playerIdentificationRadius);
+
+        Gizmos.color = Color.gray;
+        Gizmos.DrawSphere(transform.position, _radiusOfEnemyView);
+
+        Gizmos.color = Color.blue;
+        Gizmos.DrawSphere(_weaponSpawn + transform.position, 0.1f);
     }
 }

@@ -4,8 +4,23 @@ using UnityEngine;
 
 public class Enums : MonoBehaviour
 {
-    public enum WeaponType
+    public enum WeaponType : byte
     {
-        Pistol
+        Pistol, 
+        Rifle,
+        Shootgun
+    }
+
+    public enum EnemyType : byte
+    {
+        Weakling,
+        Fat
+    }
+
+    public enum EnemyStateType : byte
+    {
+        Idle,
+        Patrolling,
+        Pursuit
     }
 }

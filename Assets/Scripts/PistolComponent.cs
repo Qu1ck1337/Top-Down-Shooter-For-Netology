@@ -10,6 +10,7 @@ public class PistolComponent : WeaponComponent
         projectile[0].gameObject.transform.position = transform.position;
         projectile[0].gameObject.transform.rotation = transform.rotation;
         projectile[0].SetMoving(true);
+        projectile[0].Owner = GetComponentInParent<UnitComponent>();
         _currentAmmoInStore -= 1;
     }
 
