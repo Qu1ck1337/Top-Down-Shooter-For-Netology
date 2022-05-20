@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class WeaponComponent : MonoBehaviour
 {
     [SerializeField]
@@ -40,6 +41,9 @@ public class WeaponComponent : MonoBehaviour
 
     public int CurrentAmmoInStore { get => _currentAmmoInStore; }
 
+    private Rigidbody _rigidBody;
+    public Rigidbody WeaponRigidBody => _rigidBody;
+
 
     protected ProjectilePool _projectilePool;
     protected bool _isShootState = true;
@@ -48,6 +52,7 @@ public class WeaponComponent : MonoBehaviour
 
     private void Start()
     {
+        _rigidBody = GetComponent<Rigidbody>();
         _currentAllAmmo = _allAmmo;
         _currentAmmoInStore = _ammoInStore;
         _projectilePool = FindObjectOfType<ProjectilePool>();

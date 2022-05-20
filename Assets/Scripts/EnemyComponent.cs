@@ -6,8 +6,6 @@ using UnityEngine.AI;
 
 public class EnemyComponent : UnitComponent
 {
-    [SerializeField]
-    private Vector3 _weaponSpawn;
     [Space, SerializeField, Range(0f, 100f)]
     private float _playerIdentificationRadius;
 
@@ -20,7 +18,7 @@ public class EnemyComponent : UnitComponent
     private float _delayTimeAfterFire;
 
     [SerializeField, Space]
-    private Vector3[] _patrollingPoints;
+    private List<Vector3> _patrollingPoints = new List<Vector3>();
     private int _currentPartollingPointIndex;
     [SerializeField]
     private float _stayOnRadiusPatrollingPoint;
@@ -42,16 +40,18 @@ public class EnemyComponent : UnitComponent
     private void Start()
     {
         _weapon = Instantiate(_weapon, transform);
-        _weapon.transform.position = _weaponSpawn + transform.position;
+        _weapon.transform.position = _weaponSpawn + transform.localPosition;
         _agent = GetComponent<NavMeshAgent>();
         _target = FindObjectOfType<PlayerComponent>().gameObject.transform;
         _projectilePool = FindObjectOfType<ProjectilePool>();
-        if (_patrollingPoints.Length > 0) StateType = Enums.EnemyStateType.Patrolling;
+        if (_patrollingPoints.Count > 0)
+        {
+            _patrollingPoints.Add(transform.position);
+            StateType = Enums.EnemyStateType.Patrolling;
+        }
         else
         {
-            Vector3[] _patrollingPointsNew = new Vector3[1];
-            _patrollingPointsNew[0] = transform.position;
-            _patrollingPoints = _patrollingPointsNew;
+            _patrollingPoints.Add(transform.position);
         }
     }
 
@@ -73,7 +73,8 @@ public class EnemyComponent : UnitComponent
                 break;
             case Enums.EnemyStateType.Patrolling:
                 if (!_isMovingOnPatrolling) return;
-                var ind = _currentPartollingPointIndex % _patrollingPoints.Length;
+                _agent.speed = _movementSpeed;
+                var ind = _currentPartollingPointIndex % _patrollingPoints.Count;
                 _agent.destination = _patrollingPoints[ind];
                 if (Vector3.Distance(new Vector3(_patrollingPoints[ind].x, transform.position.y, _patrollingPoints[ind].z), transform.position) < _stayOnRadiusPatrollingPoint)
                 {

@@ -35,7 +35,10 @@ public class PlayerComponent : UnitComponent
 
     private void Start()
     {
+        _weapon = Instantiate(_weapon, transform);
+        _weapon.transform.position = _weaponSpawn + transform.localPosition;
         _controls.Player.Fire.performed += FireLogic;
+        _controls.Player.DropWeapon.performed += _ => DropWeapon();
     }
 
     private void MovementLogic()
@@ -72,9 +75,7 @@ public class PlayerComponent : UnitComponent
         {
             _animator.SetTrigger("HandAttack");
         }
-
     }
-
 
     private void OnDisable()
     {
@@ -84,5 +85,11 @@ public class PlayerComponent : UnitComponent
     private void OnDestroy()
     {
         _controls.Dispose();
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawSphere(_weaponSpawn + transform.position, 0.1f);
     }
 }
