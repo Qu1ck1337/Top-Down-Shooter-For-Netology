@@ -7,10 +7,6 @@ using UnityEngine.InputSystem;
 public class PlayerComponent : UnitComponent
 {
     private PlayerControls _controls;
-    [SerializeField]
-    private Animator _animator;
-    
-    private Rigidbody _rigidBody;
 
     private void Awake()
     {
@@ -23,6 +19,15 @@ public class PlayerComponent : UnitComponent
         _controls.Enable();
     }
 
+    private void Start()
+    {
+        _handTrigger = GetComponentInChildren<SphereCollider>();
+        _weapon = Instantiate(_weapon, transform);
+        _weapon.transform.position = _weaponSpawn + transform.localPosition;
+        _controls.Player.Fire.performed += FireLogic;
+        _controls.Player.DropWeapon.performed += _ => DropWeapon();
+    }
+
     private void Update()
     {
         RotationLogic();
@@ -30,20 +35,26 @@ public class PlayerComponent : UnitComponent
 
     private void FixedUpdate()
     {
-        MovementLogic();
-    }
-
-    private void Start()
-    {
-        _weapon = Instantiate(_weapon, transform);
-        _weapon.transform.position = _weaponSpawn + transform.localPosition;
-        _controls.Player.Fire.performed += FireLogic;
-        _controls.Player.DropWeapon.performed += _ => DropWeapon();
-    }
-
-    private void MovementLogic()
-    {
         Vector2 direction = _controls.Player.Movement.ReadValue<Vector2>();
+        MovementLogic(direction);
+        UpdateAnimation(direction);
+    }
+    private void UpdateAnimation(Vector2 direction)
+    {
+        var velocity = _rigidBody.velocity.normalized;
+        Debug.Log(velocity);
+
+        if (direction.x == 0 && direction.y == 0) _animator.SetBool("IsMoving", false);
+        else
+        {
+            _animator.SetBool("IsMoving", true);
+            _animator.SetFloat("HorizontalMoving", velocity.x);
+            _animator.SetFloat("VerticalMoving", velocity.z);
+        }
+    }
+
+    private void MovementLogic(Vector2 direction)
+    {
         _rigidBody.AddForce(new Vector3(direction.x, 0, direction.y) * _movementSpeed * Time.fixedDeltaTime, ForceMode.VelocityChange);
         //_rigidBody.velocity = Vector3.ClampMagnitude(_rigidBody.velocity, _movementSpeed);
         //transform.position += new Vector3(direction.x, 0f, direction.y) * _movementSpeed * Time.deltaTime;
@@ -73,7 +84,11 @@ public class PlayerComponent : UnitComponent
             _weapon.checkAndFire();
         else
         {
-            _animator.SetTrigger("HandAttack");
+            if (!_inAnimation)
+            {
+                _animator.SetTrigger("HandAttack");
+                _inAnimation = true;
+            }
         }
     }
 

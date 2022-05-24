@@ -6,6 +6,11 @@ using UnityEngine;
 public class UnitComponent : MonoBehaviour
 {
     [SerializeField]
+    protected Animator _animator;
+
+    protected bool _inAnimation;
+
+    [Space, SerializeField]
     protected Vector3 _weaponSpawn;
     [SerializeField, Range(0, 100)]
     protected int _health;
@@ -17,6 +22,16 @@ public class UnitComponent : MonoBehaviour
     protected WeaponComponent _weapon;
     [SerializeField]
     private float _dropWeaponImpulse = 100f;
+
+    protected Rigidbody _rigidBody;
+
+    [SerializeField]
+    protected SphereCollider _handTrigger;
+
+    private void Awake()
+    {
+        _rigidBody = GetComponent<Rigidbody>();
+    }
 
     public void ReduceHealthAndKill(int reduce)
     {
@@ -37,6 +52,8 @@ public class UnitComponent : MonoBehaviour
             _weapon.transform.parent = null;
             _weapon.transform.eulerAngles = new Vector3(0f, 0f, 30f);
             _weapon.WeaponRigidBody.AddForce(parent.forward * _dropWeaponImpulse);
+            _weapon.Owner = null;
+            _weapon.SetFlyingTrue();
             _weapon = null;
         }
     }
@@ -45,13 +62,32 @@ public class UnitComponent : MonoBehaviour
     {
         if (_weapon != null) return;
         var weaponComponent = collision.gameObject.GetComponent<WeaponComponent>();
-        if (weaponComponent != null)
+        if (weaponComponent != null && weaponComponent.Owner == null)
         {
             _weapon = weaponComponent;
+            _weapon.Owner = this;
             _weapon.WeaponRigidBody.isKinematic = true;
             _weapon.transform.parent = transform;
             _weapon.transform.localPosition = _weaponSpawn;
             _weapon.transform.rotation = transform.rotation;
+        }
+    }
+
+    protected void OnHandCollisionToggle_UnityEvent(AnimationEvent data)
+    {
+        _handTrigger.enabled = !_handTrigger.enabled;
+    }
+
+    protected void OnAnimationEnd_UnityEvent(AnimationEvent data)
+    {
+        _inAnimation = false;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.GetComponent<UnitComponent>() != null)
+        {
+            Destroy(other.gameObject);
         }
     }
 }

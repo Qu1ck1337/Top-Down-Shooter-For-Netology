@@ -94,6 +94,20 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!136 &2922641987859485768
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3939892223222624234}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 0.8349871
+  m_Height: 0.971557
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.050266325, z: -0.10166764}
 --- !u!136 &6437242275424908467
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -145,3 +159,5 @@ MonoBehaviour:
   _reloadTime: 3
   _currentAllAmmo: 0
   _currentAmmoInStore: 0
+  _triggerCollider: {fileID: 0}
+  Owner: {fileID: 0}

@@ -30,17 +30,26 @@ public class EnemyComponent : UnitComponent
     [Space, SerializeField]
     private float _pursuitSpeed;
 
+    [Space, SerializeField]
+    private float _distanceToHandAttack = 0.2f;
+
     private Transform _target;
     private NavMeshAgent _agent;
-
     private ProjectilePool _projectilePool;
+    private bool _inCooldown;
 
     public Enums.EnemyStateType StateType { get; private set; } = Enums.EnemyStateType.Idle;
 
     private void Start()
     {
-        _weapon = Instantiate(_weapon, transform);
-        _weapon.transform.position = _weaponSpawn + transform.localPosition;
+        _handTrigger = GetComponentInChildren<SphereCollider>();
+
+        if (_weapon != null)
+        {
+            _weapon = Instantiate(_weapon, transform);
+            _weapon.transform.position = _weaponSpawn + transform.localPosition;
+        }
+
         _agent = GetComponent<NavMeshAgent>();
         _target = FindObjectOfType<PlayerComponent>().gameObject.transform;
         _projectilePool = FindObjectOfType<ProjectilePool>();
@@ -57,9 +66,30 @@ public class EnemyComponent : UnitComponent
 
     private void Update()
     {
+        if (_target == null) return;
+        if (_inCooldown) return;
         TargetDetection();
         if (!_isMoving) return;
         UpdateStatus();
+    }
+
+    private void FixedUpdate()
+    {
+        UpdateAnimation();
+    }
+
+    private void UpdateAnimation()
+    {
+        var velocity = _agent.velocity.normalized;
+        Debug.Log(velocity);
+
+        if (velocity.x < 0.5f && velocity.x > -0.5f && velocity.z < 0.5f && velocity.z > -0.5f) _animator.SetBool("IsMoving", false);
+        else
+        {
+            _animator.SetBool("IsMoving", true);
+            _animator.SetFloat("HorizontalMoving", velocity.x);
+            _animator.SetFloat("VerticalMoving", velocity.z);
+        }
     }
 
     private bool _isMovingOnPatrolling = true;
@@ -92,13 +122,24 @@ public class EnemyComponent : UnitComponent
 
     private void FireLogic()
     {
-        RaycastHit hit;
-        Physics.Raycast(_weapon.transform.position, _weapon.transform.forward, out hit);
-        if (Vector3.Distance(transform.position, _target.position) < _weapon.GetRadiusToFire() && hit.collider != null && hit.collider.GetComponent<PlayerComponent>() != null)
+        if (_weapon != null)
         {
-            _weapon.checkAndFire();
-            _isMoving = false;
-            StartCoroutine(StopEnemyAfterFire());
+            RaycastHit hit;
+            Physics.Raycast(_weapon.transform.position, _weapon.transform.forward, out hit);
+            if (Vector3.Distance(transform.position, _target.position) < _weapon.GetRadiusToFire() && hit.collider != null && hit.collider.GetComponent<PlayerComponent>() != null)
+            {
+                _weapon.checkAndFire();
+                _isMoving = false;
+                StartCoroutine(StopEnemyAfterFire());
+            }
+        }
+        else
+        {
+            if (!_inAnimation && Vector3.Distance(transform.position, _target.transform.position) <= _distanceToHandAttack)
+            {
+                _animator.SetTrigger("HandAttack");
+                _inAnimation = true;
+            }
         }
     }
 
@@ -137,6 +178,18 @@ public class EnemyComponent : UnitComponent
             return true;
         }
         return false;
+    }
+
+    public void SetEnemyCooldown(float seconds)
+    {
+        StartCoroutine(SetCooldown(seconds));
+    }
+
+    private IEnumerator SetCooldown(float seconds)
+    {
+        _inCooldown = true;
+        yield return new WaitForSeconds(seconds);
+        _inCooldown = false;
     }
 
     private void OnDrawGizmosSelected()

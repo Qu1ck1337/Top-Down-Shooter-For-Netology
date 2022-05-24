@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(CapsuleCollider))]
 public class WeaponComponent : MonoBehaviour
 {
     [SerializeField]
@@ -33,13 +34,16 @@ public class WeaponComponent : MonoBehaviour
 
     [SerializeField]
     protected int _currentAllAmmo;
-
     public int CurrentAllAmmo { get => _currentAllAmmo; }
 
     [SerializeField]
     protected int _currentAmmoInStore;
-
     public int CurrentAmmoInStore { get => _currentAmmoInStore; }
+
+    [SerializeField]
+    private CapsuleCollider _triggerCollider;
+
+    public UnitComponent Owner;
 
     private Rigidbody _rigidBody;
     public Rigidbody WeaponRigidBody => _rigidBody;
@@ -49,6 +53,9 @@ public class WeaponComponent : MonoBehaviour
     protected bool _isShootState = true;
     protected bool _isReloading;
     protected float _timer;
+
+    private bool _isFlying;
+    public void SetFlyingTrue() => _isFlying = true;
 
     private void Start()
     {
@@ -97,6 +104,18 @@ public class WeaponComponent : MonoBehaviour
         {
             Gizmos.color = Color.green;
             Gizmos.DrawSphere(transform.position, _radiusToFire);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.isStatic == true)
+        {
+            _isFlying = false;
+        }
+        else if (_isFlying && other.GetComponent<EnemyComponent>() != null)
+        {
+            other.GetComponent<EnemyComponent>().SetEnemyCooldown(2f);
         }
     }
 }
