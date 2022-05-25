@@ -6,8 +6,13 @@ using UnityEngine.AI;
 
 public class EnemyComponent : UnitComponent
 {
+    [Space, SerializeField]
+    private Enums.EnemyType EnemyType = Enums.EnemyType.Weakling;
+
     [Space, SerializeField, Range(0f, 100f)]
     private float _playerIdentificationRadius;
+    [SerializeField]
+    private float _timeForPlayerPursuitInIdentificationRadius = 2f;
 
     public float GetPlayerIdentificationRadius => _playerIdentificationRadius;
 
@@ -37,6 +42,10 @@ public class EnemyComponent : UnitComponent
     private NavMeshAgent _agent;
     private ProjectilePool _projectilePool;
     private bool _inCooldown;
+    private bool _isTargetInIdentificationRadius;
+
+    [Space, SerializeField]
+    private bool _showGizmos;
 
     public Enums.EnemyStateType StateType { get; private set; } = Enums.EnemyStateType.Idle;
 
@@ -44,10 +53,11 @@ public class EnemyComponent : UnitComponent
     {
         _handTrigger = GetComponentInChildren<SphereCollider>();
 
-        if (_weapon != null)
+        if (EnemyType != Enums.EnemyType.Fat && _weapon != null)
         {
             _weapon = Instantiate(_weapon, transform);
             _weapon.transform.position = _weaponSpawn + transform.localPosition;
+            _weapon.Owner = this;
         }
 
         _agent = GetComponent<NavMeshAgent>();
@@ -81,7 +91,6 @@ public class EnemyComponent : UnitComponent
     private void UpdateAnimation()
     {
         var velocity = _agent.velocity.normalized;
-        Debug.Log(velocity);
 
         if (velocity.x < 0.5f && velocity.x > -0.5f && velocity.z < 0.5f && velocity.z > -0.5f) _animator.SetBool("IsMoving", false);
         else
@@ -122,38 +131,43 @@ public class EnemyComponent : UnitComponent
 
     private void FireLogic()
     {
-        if (_weapon != null)
+        RaycastHit hit;
+        Physics.Raycast(transform.position, transform.forward, out hit);
+        if (_weapon != null && Vector3.Distance(transform.position, _target.position) < _weapon.GetRadiusToFire() && hit.collider != null && hit.collider.GetComponent<PlayerComponent>() != null)
         {
-            RaycastHit hit;
-            Physics.Raycast(_weapon.transform.position, _weapon.transform.forward, out hit);
-            if (Vector3.Distance(transform.position, _target.position) < _weapon.GetRadiusToFire() && hit.collider != null && hit.collider.GetComponent<PlayerComponent>() != null)
-            {
-                _weapon.checkAndFire();
-                _isMoving = false;
-                StartCoroutine(StopEnemyAfterFire());
-            }
+            _weapon.checkAndFire();
+            _isMoving = false;
+            StartCoroutine(StopAfterFire());
+
+            if (_weapon.CurrentAllAmmo <= 0 && _weapon.CurrentAmmoInStore <= 0)
+                DropWeapon();
         }
-        else
+        else if (!_inAnimation && Vector3.Distance(transform.position, _target.transform.position) <= _distanceToHandAttack && hit.collider != null && hit.collider.GetComponent<PlayerComponent>() != null)
         {
-            if (!_inAnimation && Vector3.Distance(transform.position, _target.transform.position) <= _distanceToHandAttack)
-            {
-                _animator.SetTrigger("HandAttack");
-                _inAnimation = true;
-            }
+            _animator.SetTrigger("HandAttack");
+            _inAnimation = true;
         }
     }
 
-    private IEnumerator StopEnemyAfterFire()
+    private IEnumerator StopAfterFire()
     {
         _agent.destination = transform.position;
         yield return new WaitForSeconds(_delayTimeAfterFire);
-        if (!(_weapon.CurrentAllAmmo <= 0 && _weapon.CurrentAmmoInStore <= 0))
-            _isMoving = true;
+        //if (!(_weapon.CurrentAllAmmo <= 0 && _weapon.CurrentAmmoInStore <= 0))
+        _isMoving = true;
     }
 
     private void TargetDetection()
     {
-        if (Vector3.Distance(transform.position, _target.position) < _playerIdentificationRadius || Vector3.Distance(transform.position, _target.position) < _radiusOfEnemyView && IsAnyBulletsAround())
+        if (Vector3.Distance(transform.position, _target.position) < _playerIdentificationRadius)
+        {
+            if (!_isTargetInIdentificationRadius && StateType != Enums.EnemyStateType.Pursuit)
+            {
+                _isTargetInIdentificationRadius = true;
+                StartCoroutine(WaitForTargetStayingInIdentificationRadius());
+            }
+        }
+        else if (Vector3.Distance(transform.position, _target.position) < _radiusOfEnemyView && IsAnyBulletsAround())
         {
             StateType = Enums.EnemyStateType.Pursuit;
         }
@@ -161,6 +175,17 @@ public class EnemyComponent : UnitComponent
         {
             StateType = Enums.EnemyStateType.Patrolling;
         }
+        else
+        {
+            _isTargetInIdentificationRadius = false;
+        }
+    }
+
+    private IEnumerator WaitForTargetStayingInIdentificationRadius()
+    {
+        yield return new WaitForSeconds(_timeForPlayerPursuitInIdentificationRadius);
+        if (Vector3.Distance(transform.position, _target.position) < _playerIdentificationRadius)
+            StateType = Enums.EnemyStateType.Pursuit;
     }
 
     private IEnumerator ChangePatrollingPoint() 
@@ -199,6 +224,9 @@ public class EnemyComponent : UnitComponent
             Gizmos.color = Color.green;
             Gizmos.DrawSphere(point, 1f);
         }
+
+        if (!_showGizmos) return;
+
         Gizmos.color = Color.red;
         Gizmos.DrawSphere(transform.position, _playerIdentificationRadius);
 
@@ -207,5 +235,20 @@ public class EnemyComponent : UnitComponent
 
         Gizmos.color = Color.blue;
         Gizmos.DrawSphere(_weaponSpawn + transform.position, 0.1f);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (EnemyType == Enums.EnemyType.Fat || _weapon != null) return;
+        var weaponComponent = collision.gameObject.GetComponent<WeaponComponent>();
+        if (weaponComponent != null && weaponComponent.Owner == null)
+        {
+            _weapon = weaponComponent;
+            _weapon.Owner = this;
+            _weapon.WeaponRigidBody.isKinematic = true;
+            _weapon.transform.parent = transform;
+            _weapon.transform.localPosition = _weaponSpawn;
+            _weapon.transform.rotation = transform.rotation;
+        }
     }
 }

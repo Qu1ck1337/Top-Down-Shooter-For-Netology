@@ -5,7 +5,10 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    private PlayerComponent _player;
+    [SerializeField]
+    private string _sceneName;
+
+private PlayerComponent _player;
 
     private void Start()
     {
@@ -16,7 +19,7 @@ public class GameManager : MonoBehaviour
     {
         if (_player == null)
         {
-            SceneManager.LoadScene(0);
+            SceneManager.LoadScene(_sceneName);
         }
     }
 }

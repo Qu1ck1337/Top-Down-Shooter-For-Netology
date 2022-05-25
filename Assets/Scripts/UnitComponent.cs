@@ -16,16 +16,15 @@ public class UnitComponent : MonoBehaviour
     protected int _health;
     [SerializeField, Range(0f, 1000f)]
     protected float _movementSpeed;
-    [SerializeField, Range(0f, 1000f)]
-    protected float _maxVelocity;
     [SerializeField]
     protected WeaponComponent _weapon;
     [SerializeField]
     private float _dropWeaponImpulse = 100f;
+    [SerializeField]
+    protected int _damageOfHandAttack = 1;
 
     protected Rigidbody _rigidBody;
 
-    [SerializeField]
     protected SphereCollider _handTrigger;
 
     private void Awake()
@@ -85,9 +84,10 @@ public class UnitComponent : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.GetComponent<UnitComponent>() != null)
+        var unit = other.GetComponent<UnitComponent>();
+        if (unit != null)
         {
-            Destroy(other.gameObject);
+            unit.ReduceHealthAndKill(_damageOfHandAttack);
         }
     }
 }

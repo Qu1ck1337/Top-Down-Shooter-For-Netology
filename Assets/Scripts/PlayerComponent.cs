@@ -6,6 +6,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerComponent : UnitComponent
 {
+    [SerializeField, Range(0f, 1000f)]
+    protected float _maxVelocity;
     private PlayerControls _controls;
 
     private void Awake()
@@ -24,6 +26,7 @@ public class PlayerComponent : UnitComponent
         _handTrigger = GetComponentInChildren<SphereCollider>();
         _weapon = Instantiate(_weapon, transform);
         _weapon.transform.position = _weaponSpawn + transform.localPosition;
+        _weapon.Owner = this;
         _controls.Player.Fire.performed += FireLogic;
         _controls.Player.DropWeapon.performed += _ => DropWeapon();
     }
@@ -42,7 +45,6 @@ public class PlayerComponent : UnitComponent
     private void UpdateAnimation(Vector2 direction)
     {
         var velocity = _rigidBody.velocity.normalized;
-        Debug.Log(velocity);
 
         if (direction.x == 0 && direction.y == 0) _animator.SetBool("IsMoving", false);
         else
