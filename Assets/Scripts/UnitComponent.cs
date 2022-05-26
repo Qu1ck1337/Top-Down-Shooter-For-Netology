@@ -61,7 +61,7 @@ public class UnitComponent : MonoBehaviour
     {
         if (_weapon != null) return;
         var weaponComponent = collision.gameObject.GetComponent<WeaponComponent>();
-        if (weaponComponent != null && weaponComponent.Owner == null)
+        if (weaponComponent != null && weaponComponent.Owner == null && weaponComponent.CanBePickedUp)
         {
             _weapon = weaponComponent;
             _weapon.Owner = this;

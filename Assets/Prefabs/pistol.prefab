@@ -152,12 +152,11 @@ MonoBehaviour:
   _projectileDelay: 0.1
   _projectileDeviation: 0
   _weaponType: 0
-  _radiusToFire: 5
+  _radiusToFire: 3
   _showFireRadiusGizmos: 0
-  _allAmmo: 1
-  _ammoInStore: 1
+  _allAmmo: 28
+  _ammoInStore: 7
   _reloadTime: 3
   _currentAllAmmo: 0
   _currentAmmoInStore: 0
-  _triggerCollider: {fileID: 0}
   Owner: {fileID: 0}

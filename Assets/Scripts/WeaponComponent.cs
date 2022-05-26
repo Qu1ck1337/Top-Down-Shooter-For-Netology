@@ -6,6 +6,8 @@ using UnityEngine;
 [RequireComponent(typeof(CapsuleCollider))]
 public class WeaponComponent : MonoBehaviour
 {
+    //todo добавить поле для увеличения расстояния для выстрела врага
+
     [SerializeField]
     protected ProjectileComponent _projectile;
     [SerializeField]
@@ -40,10 +42,11 @@ public class WeaponComponent : MonoBehaviour
     protected int _currentAmmoInStore;
     public int CurrentAmmoInStore { get => _currentAmmoInStore; }
 
-    [SerializeField]
+    public UnitComponent Owner;
+
     private CapsuleCollider _triggerCollider;
 
-    public UnitComponent Owner;
+    public bool CanBePickedUp { get; private set; }
 
     private Rigidbody _rigidBody;
     public Rigidbody WeaponRigidBody => _rigidBody;
@@ -67,6 +70,11 @@ public class WeaponComponent : MonoBehaviour
 
     private void Update()
     {
+        if (Owner != null)
+        {
+            CanBePickedUp = false;
+        }
+
         if (_isShootState == false)
         {
             _timer += Time.deltaTime;
@@ -112,6 +120,7 @@ public class WeaponComponent : MonoBehaviour
         if (other.gameObject.isStatic == true)
         {
             _isFlying = false;
+            CanBePickedUp = true;
         }
         else if (_isFlying && other.GetComponent<EnemyComponent>() != null)
         {

@@ -27,6 +27,7 @@ public class ProjectileComponent : MonoBehaviour
         if (unit != null)
         {
             unit.ReduceHealthAndKill(_damage);
+            //transform.position = transform.parent.transform.position;
         }
     }
 }

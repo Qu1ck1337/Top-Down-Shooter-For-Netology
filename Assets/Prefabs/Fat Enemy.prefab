@@ -733,7 +733,6 @@ MonoBehaviour:
   _weapon: {fileID: 0}
   _dropWeaponImpulse: 100
   _damageOfHandAttack: 1
-  EnemyType: 1
   _playerIdentificationRadius: 6
   _timeForPlayerPursuitInIdentificationRadius: 2
   _radiusOfEnemyView: 11
@@ -743,8 +742,11 @@ MonoBehaviour:
   _delayStayingOnPoint: 3
   _delayStayingOnPointOffset: 1.5
   _pursuitSpeed: 10
-  _distanceToHandAttack: 2
+  _rotateSpeed: 500
+  _distanceToAttack: 1
+  _canPickUpWeapon: 0
   _showGizmos: 0
+  _test: 0
 --- !u!136 &6801732113834532187
 CapsuleCollider:
   m_ObjectHideFlags: 0
