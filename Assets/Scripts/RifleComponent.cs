@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PistolComponent : WeaponComponent
+public class RifleComponent : WeaponComponent
 {
     private void Awake()
     {

@@ -21,13 +21,17 @@ public class ProjectileComponent : MonoBehaviour
             transform.Translate(Vector3.forward * _speed * Time.deltaTime);
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision collision)
     {
-        UnitComponent unit = other.GetComponent<UnitComponent>();
+        UnitComponent unit = collision.gameObject.GetComponent<UnitComponent>();
         if (unit != null)
         {
             unit.ReduceHealthAndKill(_damage);
-            //transform.position = transform.parent.transform.position;
+        }
+        if (collision.gameObject.isStatic || unit != null)
+        {
+            transform.position = transform.parent.position;
+            _isMoving = false;
         }
     }
 }

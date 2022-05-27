@@ -1184,8 +1184,8 @@ GameObject:
   - component: {fileID: 3602039728362871510}
   - component: {fileID: 3512452830502428272}
   - component: {fileID: 3596571239870946696}
-  - component: {fileID: 3596571239870946697}
   - component: {fileID: 3596571239870946698}
+  - component: {fileID: 3596571239870946697}
   - component: {fileID: 3596571239870946699}
   m_Layer: 0
   m_Name: Weakling Enemy
@@ -1241,7 +1241,7 @@ NavMeshAgent:
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 3.5
-  m_Acceleration: 30
+  m_Acceleration: 60
   avoidancePriority: 50
   m_AngularSpeed: 360
   m_StoppingDistance: 2
@@ -1252,6 +1252,43 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &3596571239870946698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3596571239870946700}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d953214d384f9c5449f4fb35aba745b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animator: {fileID: 3512452830502428272}
+  _weaponSpawn: {x: 0, y: 1.245, z: 0.4}
+  _rifleSpawnPoint: {x: 0, y: 1.245, z: 0.606}
+  _health: 1
+  _movementSpeed: 5
+  _weapon: {fileID: 0}
+  _dropWeaponImpulse: 100
+  _damageOfHandAttack: 1
+  _randomWeapons:
+  - {fileID: 5664080568335045170, guid: c39cfa5bdc0ad26419f80092e3f7fb63, type: 3}
+  - {fileID: 6060096647673381959, guid: be12202e7a0678e4c9d0f5a3759d1d60, type: 3}
+  _playerIdentificationRadius: 10
+  _timeForPlayerPursuitInIdentificationRadius: 2
+  _radiusOfEnemyView: 25
+  _delayTimeAfterFire: 1
+  _patrollingPoints: []
+  _stayOnRadiusPatrollingPoint: 2
+  _delayStayingOnPoint: 3
+  _delayStayingOnPointOffset: 1.5
+  _pursuitSpeed: 7.5
+  _rotateSpeed: 500
+  _distanceToAttack: 2
+  _canPickUpWeapon: 1
+  _showGizmos: 1
+  _test: 0
 --- !u!54 &3596571239870946697
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1268,39 +1305,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
---- !u!114 &3596571239870946698
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3596571239870946700}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d953214d384f9c5449f4fb35aba745b8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _animator: {fileID: 3512452830502428272}
-  _weaponSpawn: {x: 0, y: 1.47, z: 1.17}
-  _health: 1
-  _movementSpeed: 5
-  _weapon: {fileID: 5664080568335045170, guid: c39cfa5bdc0ad26419f80092e3f7fb63, type: 3}
-  _dropWeaponImpulse: 100
-  _damageOfHandAttack: 1
-  _playerIdentificationRadius: 6
-  _timeForPlayerPursuitInIdentificationRadius: 2
-  _radiusOfEnemyView: 11
-  _delayTimeAfterFire: 1
-  _patrollingPoints: []
-  _stayOnRadiusPatrollingPoint: 2
-  _delayStayingOnPoint: 3
-  _delayStayingOnPointOffset: 1.5
-  _pursuitSpeed: 15
-  _rotateSpeed: 500
-  _distanceToAttack: 1.51
-  _canPickUpWeapon: 1
-  _showGizmos: 0
-  _test: 0
 --- !u!136 &3596571239870946699
 CapsuleCollider:
   m_ObjectHideFlags: 0

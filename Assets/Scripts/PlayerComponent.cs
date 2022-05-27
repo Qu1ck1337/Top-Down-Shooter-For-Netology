@@ -24,10 +24,14 @@ public class PlayerComponent : UnitComponent
     private void Start()
     {
         _handTrigger = GetComponentInChildren<SphereCollider>();
-        _weapon = Instantiate(_weapon, transform);
-        _weapon.transform.position = _weaponSpawn + transform.localPosition;
-        _weapon.Owner = this;
-        _controls.Player.Fire.performed += FireLogic;
+        if (_weapon != null)
+        {
+            _weapon = Instantiate(_weapon, transform);
+            _weapon.Owner = this;
+            TransformWeaponToPoint();
+            _weapon.ToggleColliders();
+        }
+        _controls.Player.Fire.performed += TouchFire;
         _controls.Player.DropWeapon.performed += _ => DropWeapon();
     }
 
@@ -80,7 +84,7 @@ public class PlayerComponent : UnitComponent
         Gizmos.DrawLine(transform.position, transform.forward * 10);
     }
 
-    private void FireLogic(InputAction.CallbackContext context)
+    private void TouchFire(InputAction.CallbackContext context)
     {
         if (_weapon != null)
             _weapon.checkAndFire();
@@ -108,5 +112,8 @@ public class PlayerComponent : UnitComponent
     {
         Gizmos.color = Color.blue;
         Gizmos.DrawSphere(_weaponSpawn + transform.position, 0.1f);
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(_rifleSpawnPoint + transform.position, 0.1f);
     }
 }

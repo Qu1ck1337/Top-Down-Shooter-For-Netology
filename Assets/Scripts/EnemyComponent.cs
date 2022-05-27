@@ -6,6 +6,9 @@ using UnityEngine.AI;
 
 public class EnemyComponent : UnitComponent
 {
+    [Space, SerializeField]
+    private List<WeaponComponent> _randomWeapons = new List<WeaponComponent>();
+
     [Space, SerializeField, Range(0f, 100f)]
     private float _playerIdentificationRadius;
     [SerializeField]
@@ -59,9 +62,18 @@ public class EnemyComponent : UnitComponent
         if (_weapon != null)
         {
             _weapon = Instantiate(_weapon, transform);
-            _weapon.transform.position = _weaponSpawn + transform.localPosition;
+            TransformWeaponToPoint();
             _weapon.Owner = this;
             _distanceToAttack += _weapon.GetRadiusToFire();
+            _weapon.ToggleColliders();
+        }
+        else if (_randomWeapons.Count != 0)
+        {
+            _weapon = Instantiate(_randomWeapons[UnityEngine.Random.Range(0, _randomWeapons.Count)], transform);
+            TransformWeaponToPoint();
+            _weapon.Owner = this;
+            _distanceToAttack += _weapon.GetRadiusToFire();
+            _weapon.ToggleColliders();
         }
 
         _agent = GetComponent<NavMeshAgent>();
@@ -105,7 +117,7 @@ public class EnemyComponent : UnitComponent
     {
         var velocity = _agent.velocity.normalized;
 
-        if (velocity.magnitude < 0.2f) _animator.SetBool("IsMoving", false);
+        if (velocity.magnitude < 0.1f) _animator.SetBool("IsMoving", false);
         else
         {
             _animator.SetBool("IsMoving", true);
@@ -271,7 +283,7 @@ public class EnemyComponent : UnitComponent
         }
         if (_test)
         {
-            Debug.Log(StateType.ToString() + " " + _isEnemyOnPursuit);
+            //Debug.Log(StateType.ToString() + " " + _isEnemyOnPursuit);
         }
     }
 
@@ -324,8 +336,8 @@ public class EnemyComponent : UnitComponent
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(_weaponSpawn + transform.position, 0.1f);
 
-        Gizmos.color = Color.blue;
-        Gizmos.DrawRay(transform.position + new Vector3(0f, 1f, 0f), transform.forward * 10f);
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(_rifleSpawnPoint + transform.position, 0.1f);
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -338,9 +350,10 @@ public class EnemyComponent : UnitComponent
             _weapon.Owner = this;
             _weapon.WeaponRigidBody.isKinematic = true;
             _weapon.transform.parent = transform;
-            _weapon.transform.localPosition = _weaponSpawn;
+            TransformWeaponToPoint();
             _weapon.transform.rotation = transform.rotation;
             _distanceToAttack += _weapon.GetRadiusToFire();
+            _weapon.ToggleColliders();
         }
     }
 }

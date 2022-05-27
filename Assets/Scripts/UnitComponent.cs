@@ -12,6 +12,8 @@ public class UnitComponent : MonoBehaviour
 
     [Space, SerializeField]
     protected Vector3 _weaponSpawn;
+    [SerializeField]
+    protected Vector3 _rifleSpawnPoint;
     [SerializeField, Range(0, 100)]
     protected int _health;
     [SerializeField, Range(0f, 1000f)]
@@ -32,12 +34,16 @@ public class UnitComponent : MonoBehaviour
         _rigidBody = GetComponent<Rigidbody>();
     }
 
+    public delegate void EnemyDeadEventHandler(EnemyComponent enemy);
+    public event EnemyDeadEventHandler OnEnemyDeadEvent;
+
     public void ReduceHealthAndKill(int reduce)
     {
         _health -= reduce;
         if (_health <= 0)
         {
             DropWeapon();
+            OnEnemyDeadEvent?.Invoke((EnemyComponent)this);
             Destroy(this.gameObject);
         }
     }
@@ -53,6 +59,7 @@ public class UnitComponent : MonoBehaviour
             _weapon.WeaponRigidBody.AddForce(parent.forward * _dropWeaponImpulse);
             _weapon.Owner = null;
             _weapon.SetFlyingTrue();
+            _weapon.ToggleColliders();
             _weapon = null;
         }
     }
@@ -67,8 +74,9 @@ public class UnitComponent : MonoBehaviour
             _weapon.Owner = this;
             _weapon.WeaponRigidBody.isKinematic = true;
             _weapon.transform.parent = transform;
-            _weapon.transform.localPosition = _weaponSpawn;
+            TransformWeaponToPoint();
             _weapon.transform.rotation = transform.rotation;
+            _weapon.ToggleColliders();
         }
     }
 
@@ -88,6 +96,21 @@ public class UnitComponent : MonoBehaviour
         if (unit != null)
         {
             unit.ReduceHealthAndKill(_damageOfHandAttack);
+        }
+    }
+
+    protected void TransformWeaponToPoint()
+    {
+        switch (_weapon.GetWeaponType)
+        {
+            case Enums.WeaponType.Pistol:
+                _weapon.transform.localPosition = _weaponSpawn;
+                break;
+            case Enums.WeaponType.Rifle:
+                _weapon.transform.localPosition = _rifleSpawnPoint;
+                break;
+            case Enums.WeaponType.Shootgun:
+                break;
         }
     }
 }

@@ -7,17 +7,12 @@ using UnityEngine;
 public class WeaponComponent : MonoBehaviour
 {
     //todo добавить поле для увеличения расстояния для выстрела врага
-
     [SerializeField]
     protected ProjectileComponent _projectile;
     [SerializeField]
     protected float _projectileDelay;
     [SerializeField, Range(0f, 1f)]
     protected float _projectileDeviation;
-    [SerializeField]
-    private Enums.WeaponType _weaponType;
-
-    public Enums.WeaponType GetWeaponType() => _weaponType;
 
     [SerializeField]
     private float _radiusToFire;
@@ -40,6 +35,9 @@ public class WeaponComponent : MonoBehaviour
 
     [SerializeField]
     protected int _currentAmmoInStore;
+
+    [Space, SerializeField]
+    private List<Collider> _hideCollidersWhenWeaponOnUnit = new List<Collider>();
     public int CurrentAmmoInStore { get => _currentAmmoInStore; }
 
     public UnitComponent Owner;
@@ -48,9 +46,11 @@ public class WeaponComponent : MonoBehaviour
 
     public bool CanBePickedUp { get; private set; }
 
-    private Rigidbody _rigidBody;
+    protected Rigidbody _rigidBody;
     public Rigidbody WeaponRigidBody => _rigidBody;
 
+    protected Enums.WeaponType _weaponType;
+    public Enums.WeaponType GetWeaponType => _weaponType;
 
     protected ProjectilePool _projectilePool;
     protected bool _isShootState = true;
@@ -59,14 +59,6 @@ public class WeaponComponent : MonoBehaviour
 
     private bool _isFlying;
     public void SetFlyingTrue() => _isFlying = true;
-
-    private void Start()
-    {
-        _rigidBody = GetComponent<Rigidbody>();
-        _currentAllAmmo = _allAmmo;
-        _currentAmmoInStore = _ammoInStore;
-        _projectilePool = FindObjectOfType<ProjectilePool>();
-    }
 
     private void Update()
     {
@@ -96,23 +88,34 @@ public class WeaponComponent : MonoBehaviour
         }
     }
 
-    protected virtual void BulletsCheck()
+    private void BulletsCheck()
     {
+        if (_currentAmmoInStore <= 0 && _currentAllAmmo > 0)
+        {
+            StartCoroutine(Reload());
+        }
+    }
 
+    private IEnumerator Reload()
+    {
+        _isReloading = true;
+        yield return new WaitForSeconds(_reloadTime);
+        if (_currentAllAmmo < _ammoInStore)
+        {
+            _currentAmmoInStore = _currentAllAmmo;
+            _currentAllAmmo = 0;
+        }
+        else
+        {
+            _currentAmmoInStore = _ammoInStore;
+            _currentAllAmmo -= _ammoInStore;
+        }
+        _isReloading = false;
     }
 
     protected virtual void Fire()
     {
 
-    }
-
-    private void OnDrawGizmos()
-    {
-        if (_showFireRadiusGizmos)
-        {
-            Gizmos.color = Color.green;
-            Gizmos.DrawSphere(transform.position, _radiusToFire);
-        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -125,6 +128,23 @@ public class WeaponComponent : MonoBehaviour
         else if (_isFlying && other.GetComponent<EnemyComponent>() != null)
         {
             other.GetComponent<EnemyComponent>().SetEnemyCooldown(2f);
+        }
+    }
+
+    public void ToggleColliders()
+    {
+        foreach(Collider collider in _hideCollidersWhenWeaponOnUnit)
+        {
+            collider.enabled = !collider.enabled;
+        }
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (_showFireRadiusGizmos)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawSphere(transform.position, _radiusToFire);
         }
     }
 }
