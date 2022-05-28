@@ -4,7 +4,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(CapsuleCollider))]
-public class WeaponComponent : MonoBehaviour
+public class SimpleWeapon : MonoBehaviour
 {
     //todo добавить поле для увеличения расстояния для выстрела врага
     [SerializeField]
@@ -36,8 +36,6 @@ public class WeaponComponent : MonoBehaviour
     [SerializeField]
     protected int _currentAmmoInStore;
 
-    [Space, SerializeField]
-    private List<Collider> _hideCollidersWhenWeaponOnUnit = new List<Collider>();
     public int CurrentAmmoInStore { get => _currentAmmoInStore; }
 
     public UnitComponent Owner;
@@ -59,6 +57,18 @@ public class WeaponComponent : MonoBehaviour
 
     private bool _isFlying;
     public void SetFlyingTrue() => _isFlying = true;
+
+    private Collider[] _hideCollidersWhenWeaponOnUnit;
+
+    private void Awake()
+    {
+        _weaponType = Enums.WeaponType.Rifle;
+        _rigidBody = GetComponent<Rigidbody>();
+        _currentAllAmmo = _allAmmo;
+        _currentAmmoInStore = _ammoInStore;
+        _projectilePool = FindObjectOfType<ProjectilePool>();
+        _hideCollidersWhenWeaponOnUnit = GetComponents<Collider>();
+    }
 
     private void Update()
     {
@@ -88,6 +98,16 @@ public class WeaponComponent : MonoBehaviour
         }
     }
 
+    protected virtual void Fire()
+    {
+        var projectile = _projectilePool.GetProjectiles();
+        projectile[0].gameObject.transform.position = transform.position;
+        projectile[0].gameObject.transform.rotation = transform.rotation;
+        projectile[0].SetMoving(true);
+        projectile[0].Owner = GetComponentInParent<UnitComponent>();
+        _currentAmmoInStore -= 1;
+    }
+
     private void BulletsCheck()
     {
         if (_currentAmmoInStore <= 0 && _currentAllAmmo > 0)
@@ -95,6 +115,9 @@ public class WeaponComponent : MonoBehaviour
             StartCoroutine(Reload());
         }
     }
+
+    public delegate void WeaponReloadingEventHandler();
+    public event WeaponReloadingEventHandler OnWeaponReloadingEvent;
 
     private IEnumerator Reload()
     {
@@ -111,11 +134,15 @@ public class WeaponComponent : MonoBehaviour
             _currentAllAmmo -= _ammoInStore;
         }
         _isReloading = false;
+        OnWeaponReloadingEvent?.Invoke();
     }
 
-    protected virtual void Fire()
+    public void ToggleColliders()
     {
-
+        foreach(Collider collider in _hideCollidersWhenWeaponOnUnit)
+        {
+            collider.enabled = !collider.enabled;
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -128,14 +155,6 @@ public class WeaponComponent : MonoBehaviour
         else if (_isFlying && other.GetComponent<EnemyComponent>() != null)
         {
             other.GetComponent<EnemyComponent>().SetEnemyCooldown(2f);
-        }
-    }
-
-    public void ToggleColliders()
-    {
-        foreach(Collider collider in _hideCollidersWhenWeaponOnUnit)
-        {
-            collider.enabled = !collider.enabled;
         }
     }
 

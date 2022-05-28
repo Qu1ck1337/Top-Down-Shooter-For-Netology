@@ -8,21 +8,15 @@ public class PlayerComponent : UnitComponent
 {
     [SerializeField, Range(0f, 1000f)]
     protected float _maxVelocity;
+
+    public SimpleWeapon PlayerWeapon => _weapon;
+
     private PlayerControls _controls;
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         _controls = new PlayerControls();
-        _rigidBody = GetComponent<Rigidbody>();
-    }
-
-    private void OnEnable()
-    {
-        _controls.Enable();
-    }
-
-    private void Start()
-    {
         _handTrigger = GetComponentInChildren<SphereCollider>();
         if (_weapon != null)
         {
@@ -30,9 +24,15 @@ public class PlayerComponent : UnitComponent
             _weapon.Owner = this;
             TransformWeaponToPoint();
             _weapon.ToggleColliders();
+            _weapon.OnWeaponReloadingEvent += ReloadingWeapon;
         }
         _controls.Player.Fire.performed += TouchFire;
         _controls.Player.DropWeapon.performed += _ => DropWeapon();
+    }
+
+    private void OnEnable()
+    {
+        _controls.Enable();
     }
 
     private void Update()
@@ -84,10 +84,16 @@ public class PlayerComponent : UnitComponent
         Gizmos.DrawLine(transform.position, transform.forward * 10);
     }
 
+    public delegate void PlayerActionEventHandler(Enums.PlayerActionType actionType);
+    public event PlayerActionEventHandler OnPlayerActionEvent;
+
     private void TouchFire(InputAction.CallbackContext context)
     {
         if (_weapon != null)
+        {
             _weapon.checkAndFire();
+            OnPlayerActionEvent.Invoke(Enums.PlayerActionType.Shoot);
+        }
         else
         {
             if (!_inAnimation)
@@ -96,6 +102,36 @@ public class PlayerComponent : UnitComponent
                 _inAnimation = true;
             }
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (_weapon != null) return;
+        var weaponComponent = collision.gameObject.GetComponent<SimpleWeapon>();
+        if (weaponComponent != null && weaponComponent.Owner == null && weaponComponent.CanBePickedUp)
+        {
+            _weapon = weaponComponent;
+            _weapon.Owner = this;
+            _weapon.WeaponRigidBody.isKinematic = true;
+            _weapon.transform.parent = transform;
+            TransformWeaponToPoint();
+            _weapon.transform.rotation = transform.rotation;
+            _weapon.ToggleColliders();
+            _weapon.OnWeaponReloadingEvent += ReloadingWeapon;
+            OnPlayerActionEvent.Invoke(Enums.PlayerActionType.PickUpWeapon);
+        }
+    }
+
+    private void ReloadingWeapon()
+    {
+        OnPlayerActionEvent.Invoke(Enums.PlayerActionType.ReloadedWeapon);
+    }
+
+    protected override void DropWeapon()
+    {
+        _weapon.OnWeaponReloadingEvent -= ReloadingWeapon;
+        base.DropWeapon();
+        OnPlayerActionEvent.Invoke(Enums.PlayerActionType.DropWeapon);
     }
 
     private void OnDisable()

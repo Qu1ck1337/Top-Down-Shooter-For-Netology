@@ -136,7 +136,7 @@ CapsuleCollider:
   m_Height: 1.58
   m_Direction: 2
   m_Center: {x: 0, y: 0.32, z: 0}
---- !u!114 &5664080568335045170
+--- !u!114 &8581549677237261955
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -145,21 +145,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 3939892223222624234}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec881813caa2f8248b15296be2bae304, type: 3}
+  m_Script: {fileID: 11500000, guid: 88e2de21348fa4247b927bd69b92ba24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _projectile: {fileID: 4980066090341991483, guid: acd3bc3bc973c9a40b6a3051f4f19b00, type: 3}
-  _projectileDelay: 0.5
-  _projectileDeviation: 0
-  _radiusToFire: 5
+  _projectileDelay: 0.3
+  _projectileDeviation: 0.095
+  _radiusToFire: 6
   _showFireRadiusGizmos: 0
-  _allAmmo: 28
+  _allAmmo: 7
   _ammoInStore: 7
   _reloadTime: 2
   _currentAllAmmo: 0
   _currentAmmoInStore: 0
-  _hideCollidersWhenWeaponOnUnit:
-  - {fileID: 8791018343105243181}
-  - {fileID: 6437242275424908467}
-  - {fileID: 2922641987859485768}
   Owner: {fileID: 0}

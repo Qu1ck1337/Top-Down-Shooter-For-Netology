@@ -19,7 +19,7 @@ public class UnitComponent : MonoBehaviour
     [SerializeField, Range(0f, 1000f)]
     protected float _movementSpeed;
     [SerializeField]
-    protected WeaponComponent _weapon;
+    protected SimpleWeapon _weapon;
     [SerializeField]
     private float _dropWeaponImpulse = 100f;
     [SerializeField]
@@ -29,13 +29,13 @@ public class UnitComponent : MonoBehaviour
 
     protected SphereCollider _handTrigger;
 
-    private void Awake()
+    protected virtual void Awake()
     {
         _rigidBody = GetComponent<Rigidbody>();
     }
 
-    public delegate void EnemyDeadEventHandler(EnemyComponent enemy);
-    public event EnemyDeadEventHandler OnEnemyDeadEvent;
+    public delegate void UnitDeadEventHandler(EnemyComponent enemy);
+    public event UnitDeadEventHandler OnUnitDeadEvent;
 
     public void ReduceHealthAndKill(int reduce)
     {
@@ -43,12 +43,12 @@ public class UnitComponent : MonoBehaviour
         if (_health <= 0)
         {
             DropWeapon();
-            OnEnemyDeadEvent?.Invoke((EnemyComponent)this);
+            OnUnitDeadEvent?.Invoke((EnemyComponent)this);
             Destroy(this.gameObject);
         }
     }
 
-    protected void DropWeapon()
+    protected virtual void DropWeapon()
     {
         if (_weapon != null)
         {
@@ -61,22 +61,6 @@ public class UnitComponent : MonoBehaviour
             _weapon.SetFlyingTrue();
             _weapon.ToggleColliders();
             _weapon = null;
-        }
-    }
-
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (_weapon != null) return;
-        var weaponComponent = collision.gameObject.GetComponent<WeaponComponent>();
-        if (weaponComponent != null && weaponComponent.Owner == null && weaponComponent.CanBePickedUp)
-        {
-            _weapon = weaponComponent;
-            _weapon.Owner = this;
-            _weapon.WeaponRigidBody.isKinematic = true;
-            _weapon.transform.parent = transform;
-            TransformWeaponToPoint();
-            _weapon.transform.rotation = transform.rotation;
-            _weapon.ToggleColliders();
         }
     }
 

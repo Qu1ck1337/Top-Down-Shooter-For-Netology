@@ -7,7 +7,7 @@ using UnityEngine.AI;
 public class EnemyComponent : UnitComponent
 {
     [Space, SerializeField]
-    private List<WeaponComponent> _randomWeapons = new List<WeaponComponent>();
+    private List<SimpleWeapon> _randomWeapons = new List<SimpleWeapon>();
 
     [Space, SerializeField, Range(0f, 100f)]
     private float _playerIdentificationRadius;
@@ -301,7 +301,6 @@ public class EnemyComponent : UnitComponent
         }
     }
 
-
     private bool IsAnyBulletsAround()
     {
         var projectile = _projectilePool.GetNearestProjectileInEnemyRadius(this);
@@ -343,7 +342,7 @@ public class EnemyComponent : UnitComponent
     private void OnCollisionEnter(Collision collision)
     {
         if (!_canPickUpWeapon || _weapon != null) return;
-        var weaponComponent = collision.gameObject.GetComponent<WeaponComponent>();
+        var weaponComponent = collision.gameObject.GetComponent<SimpleWeapon>();
         if (weaponComponent != null && weaponComponent.Owner == null && weaponComponent.CanBePickedUp)
         {
             _weapon = weaponComponent;

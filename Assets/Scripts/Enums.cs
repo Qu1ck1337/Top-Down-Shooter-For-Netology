@@ -22,4 +22,12 @@ public class Enums : MonoBehaviour
         PickUpWeapon,
         DropWeapon
     }
+
+    public enum PlayerActionType : byte
+    {
+        PickUpWeapon,
+        Shoot,
+        DropWeapon,
+        ReloadedWeapon
+    }
 }

@@ -1273,8 +1273,8 @@ MonoBehaviour:
   _dropWeaponImpulse: 100
   _damageOfHandAttack: 1
   _randomWeapons:
-  - {fileID: 5664080568335045170, guid: c39cfa5bdc0ad26419f80092e3f7fb63, type: 3}
-  - {fileID: 6060096647673381959, guid: be12202e7a0678e4c9d0f5a3759d1d60, type: 3}
+  - {fileID: 8581549677237261955, guid: c39cfa5bdc0ad26419f80092e3f7fb63, type: 3}
+  - {fileID: 4995956652729363225, guid: be12202e7a0678e4c9d0f5a3759d1d60, type: 3}
   _playerIdentificationRadius: 10
   _timeForPlayerPursuitInIdentificationRadius: 2
   _radiusOfEnemyView: 25
