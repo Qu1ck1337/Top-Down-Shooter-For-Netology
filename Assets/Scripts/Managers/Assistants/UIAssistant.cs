@@ -10,6 +10,8 @@ public class UIAssistant : MonoBehaviour
     private TextMeshProUGUI _ammoBar;
     [SerializeField]
     private TextMeshProUGUI _scoreBar;
+    [SerializeField]
+    private TextMeshProUGUI _bonusBar;
 
     public void SetAmmoBar(int currentAmmoInStore, int currentAllAmmo)
     {
@@ -27,5 +29,15 @@ public class UIAssistant : MonoBehaviour
     public void ShowPlayerScore(int score)
     {
         _scoreBar.text = score.ToString() + " pts";
+    }
+
+    public void ShowPlayerBonusScore(float score)
+    {
+        _bonusBar.text = string.Format("{0:0.0}", score) + "x";
+    }
+
+    public void ResetPlayerBonusScore()
+    {
+        _bonusBar.text = "";
     }
 }

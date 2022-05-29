@@ -29,6 +29,8 @@ public class UnitComponent : MonoBehaviour
 
     protected SphereCollider _handTrigger;
 
+    private bool _isDied;
+
     protected virtual void Awake()
     {
         _rigidBody = GetComponent<Rigidbody>();
@@ -40,8 +42,9 @@ public class UnitComponent : MonoBehaviour
     public void ReduceHealthAndKill(int reduce)
     {
         _health -= reduce;
-        if (_health <= 0)
+        if (!_isDied && _health <= 0)
         {
+            _isDied = true;
             DropWeapon();
             OnUnitDeadEvent?.Invoke((EnemyComponent)this);
             Destroy(this.gameObject);
@@ -93,7 +96,8 @@ public class UnitComponent : MonoBehaviour
             case Enums.WeaponType.Rifle:
                 _weapon.transform.localPosition = _rifleSpawnPoint;
                 break;
-            case Enums.WeaponType.Shootgun:
+            case Enums.WeaponType.Shotgun:
+                _weapon.transform.localPosition = _rifleSpawnPoint;
                 break;
         }
     }

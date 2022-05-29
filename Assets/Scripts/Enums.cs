@@ -8,7 +8,7 @@ public class Enums : MonoBehaviour
     {
         Pistol, 
         Rifle,
-        Shootgun
+        Shotgun
     }
 
     //todo для каждого стейта делать действие (Стоим, идём, преследуем, стреляем, дерёмся)

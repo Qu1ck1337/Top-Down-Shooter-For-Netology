@@ -8,12 +8,9 @@ public class SimpleWeapon : MonoBehaviour
 {
     //todo добавить поле для увеличения расстояния для выстрела врага
     [SerializeField]
-    protected ProjectileComponent _projectile;
-    [SerializeField]
     protected float _projectileDelay;
-    [SerializeField, Range(0f, 1f)]
+    [SerializeField, Range(0f, 360f)]
     protected float _projectileDeviation;
-
     [SerializeField]
     private float _radiusToFire;
 
@@ -47,7 +44,8 @@ public class SimpleWeapon : MonoBehaviour
     protected Rigidbody _rigidBody;
     public Rigidbody WeaponRigidBody => _rigidBody;
 
-    protected Enums.WeaponType _weaponType;
+    [SerializeField]
+    private Enums.WeaponType _weaponType;
     public Enums.WeaponType GetWeaponType => _weaponType;
 
     protected ProjectilePool _projectilePool;
@@ -103,6 +101,7 @@ public class SimpleWeapon : MonoBehaviour
         var projectile = _projectilePool.GetProjectiles();
         projectile[0].gameObject.transform.position = transform.position;
         projectile[0].gameObject.transform.rotation = transform.rotation;
+        projectile[0].gameObject.transform.Rotate(new Vector3(0f, Random.Range(-_projectileDeviation, _projectileDeviation), 0f));
         projectile[0].SetMoving(true);
         projectile[0].Owner = GetComponentInParent<UnitComponent>();
         _currentAmmoInStore -= 1;

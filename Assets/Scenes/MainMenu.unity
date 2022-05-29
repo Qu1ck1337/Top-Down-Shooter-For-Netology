@@ -911,12 +911,15 @@ MonoBehaviour:
     _keyValues:
     - FirstLevel
     - SecondLevel
+    - ThirdLevel
     _keys:
     - FirstLevel
     - SecondLevel
+    - ThirdLevel
     _values:
     - "\u041F\u0435\u0440\u0432\u044B\u0439 \u0443\u0440\u043E\u0432\u0435\u043D\u044C"
     - "\u0412\u0442\u043E\u0440\u043E\u0439 \u0443\u0440\u043E\u0432\u0435\u043D\u044C"
+    - "\u0422\u0440\u0435\u0442\u0438\u0439 \u0443\u0440\u043E\u0432\u0435\u043D\u044C"
 --- !u!114 &2017391996
 MonoBehaviour:
   m_ObjectHideFlags: 0
