@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 [RequireComponent(typeof(Rigidbody))]
 public class UnitComponent : MonoBehaviour
@@ -25,11 +26,16 @@ public class UnitComponent : MonoBehaviour
     [SerializeField]
     protected int _damageOfHandAttack = 1;
 
+    [Space, SerializeField]
+    protected AudioSource _punchSound;
+    [SerializeField]
+    private AudioSource _dyingSound;
+
     protected Rigidbody _rigidBody;
 
     protected SphereCollider _handTrigger;
 
-    private bool _isDied;
+    protected bool _isDead;
 
     protected virtual void Awake()
     {
@@ -42,12 +48,18 @@ public class UnitComponent : MonoBehaviour
     public void ReduceHealthAndKill(int reduce)
     {
         _health -= reduce;
-        if (!_isDied && _health <= 0)
+        if (!_isDead && _health <= 0)
         {
-            _isDied = true;
-            DropWeapon();
+            _isDead = true;
+            if (_weapon != null)
+                DropWeapon();
             OnUnitDeadEvent?.Invoke((EnemyComponent)this);
-            Destroy(this.gameObject);
+            _animator.SetTrigger("IsDying");
+            Destroy(GetComponent<Collider>());
+            _rigidBody.isKinematic = true;
+            _dyingSound.Play();
+            if (GetComponent<NavMeshAgent>() != null)
+                Destroy(GetComponent<NavMeshAgent>());
         }
     }
 
@@ -75,6 +87,11 @@ public class UnitComponent : MonoBehaviour
     protected void OnAnimationEnd_UnityEvent(AnimationEvent data)
     {
         _inAnimation = false;
+    }
+
+    protected void OnDeadAnimationEnd_UnityEvent(AnimationEvent data)
+    {
+        Destroy(this);
     }
 
     private void OnTriggerEnter(Collider other)

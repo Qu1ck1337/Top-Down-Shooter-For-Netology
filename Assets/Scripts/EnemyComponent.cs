@@ -90,9 +90,6 @@ public class EnemyComponent : UnitComponent
         }
     }
 
-
-    [SerializeField]
-    private bool _test;
     private void Update()
     {
         //        Определяем угол между целью и таргетом черезе Vector3.SignedAngle относительно оси Y
@@ -101,6 +98,7 @@ public class EnemyComponent : UnitComponent
 
         //IK animation для держания оружия
 
+        if (_isDead) return;
         if (_target == null) return;
         if (!_isMoving) return;
         TargetDetection();
@@ -110,6 +108,7 @@ public class EnemyComponent : UnitComponent
 
     private void FixedUpdate()
     {
+        if (_isDead) return;
         UpdateAnimation();
     }
 
@@ -153,6 +152,7 @@ public class EnemyComponent : UnitComponent
                 if (!_inAnimation) 
                 {
                     _animator.SetTrigger("HandAttack");
+                    _punchSound.Play();
                     _inAnimation = true;
                 }
                 break;
@@ -223,6 +223,12 @@ public class EnemyComponent : UnitComponent
         _isMoving = true;
     }
 
+    public void SetEnemyCooldown(float seconds)
+    {
+        StateType = Enums.EnemyStateType.Idle;
+        StartCoroutine(StopUnit(seconds));
+    }
+
     private bool _isEnemyOnPursuit;
     private void TargetDetection()
     {
@@ -269,9 +275,6 @@ public class EnemyComponent : UnitComponent
                 var ind = _currentPartollingPointIndex % _patrollingPoints.Count;
                 if (Vector3.Distance(new Vector3(_patrollingPoints[ind].x, transform.position.y, _patrollingPoints[ind].z), transform.position) >= _stayOnRadiusPatrollingPoint)
                 {
-                    if (_test)
-                        Debug.Log(Vector3.Distance(new Vector3(_patrollingPoints[ind].x, transform.position.y, _patrollingPoints[ind].z), transform.position));
-
                     StateType = Enums.EnemyStateType.Patrolling;
                 }
                 else
@@ -280,10 +283,6 @@ public class EnemyComponent : UnitComponent
                 }
                 _isEnemyOnPursuit = false;
             }
-        }
-        if (_test)
-        {
-            //Debug.Log(StateType.ToString() + " " + _isEnemyOnPursuit);
         }
     }
 
@@ -309,11 +308,6 @@ public class EnemyComponent : UnitComponent
             return true;
         }
         return false;
-    }
-
-    public void SetEnemyCooldown(float seconds)
-    {
-        StartCoroutine(StopUnit(seconds));
     }
 
     private void OnDrawGizmosSelected()

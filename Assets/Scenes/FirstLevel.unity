@@ -2929,6 +2929,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3594757523298809922, guid: cc8c000f47ffb494ab631ee86a60f167, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.0055947313
+      objectReference: {fileID: 0}
+    - target: {fileID: 3594757523298809922, guid: cc8c000f47ffb494ab631ee86a60f167, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.007014632
+      objectReference: {fileID: 0}
+    - target: {fileID: 3594757523298809922, guid: cc8c000f47ffb494ab631ee86a60f167, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.85369533
+      objectReference: {fileID: 0}
     - target: {fileID: 3596571239870946698, guid: cc8c000f47ffb494ab631ee86a60f167, type: 3}
       propertyPath: _weapon
       value: 
@@ -3380,6 +3392,7 @@ GameObject:
   - component: {fileID: 1900378422}
   - component: {fileID: 1900378421}
   - component: {fileID: 1900378423}
+  - component: {fileID: 1900378424}
   m_Layer: 0
   m_Name: Game Manager
   m_TagString: Untagged
@@ -3440,6 +3453,19 @@ MonoBehaviour:
   _ammoBar: {fileID: 550990676}
   _scoreBar: {fileID: 1836094658}
   _bonusBar: {fileID: 1380638352}
+--- !u!114 &1900378424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1900378420}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f05eae915d29fc142b0f4f3d7dbe8d61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _soundVolumeSettingsName: VolumeSettings
 --- !u!1 &2038704051
 GameObject:
   m_ObjectHideFlags: 0

@@ -57,6 +57,8 @@ public class SimpleWeapon : MonoBehaviour
     public void SetFlyingTrue() => _isFlying = true;
 
     private Collider[] _hideCollidersWhenWeaponOnUnit;
+    private AudioSource _shootSound;
+    private ParticleSystem _fireParticles;
 
     private void Awake()
     {
@@ -66,6 +68,8 @@ public class SimpleWeapon : MonoBehaviour
         _currentAmmoInStore = _ammoInStore;
         _projectilePool = FindObjectOfType<ProjectilePool>();
         _hideCollidersWhenWeaponOnUnit = GetComponents<Collider>();
+        _shootSound = GetComponent<AudioSource>();
+        _fireParticles = GetComponentInChildren<ParticleSystem>();
     }
 
     private void Update()
@@ -93,6 +97,10 @@ public class SimpleWeapon : MonoBehaviour
             _isShootState = false;
             Fire();
             BulletsCheck();
+            if (_shootSound != null)
+                _shootSound.Play();
+            if (_fireParticles != null)
+                _fireParticles.Play();
         }
     }
 

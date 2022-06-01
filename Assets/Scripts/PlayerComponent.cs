@@ -99,6 +99,7 @@ public class PlayerComponent : UnitComponent
             if (!_inAnimation)
             {
                 _animator.SetTrigger("HandAttack");
+                _punchSound.Play();
                 _inAnimation = true;
             }
         }

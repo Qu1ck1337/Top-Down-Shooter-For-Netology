@@ -11,7 +11,7 @@ public class ProjectilePool : MonoBehaviour
 
     private Queue<ProjectileComponent> ProjectileQueuePool = new Queue<ProjectileComponent>();
 
-    private void Start()
+    private void Awake()
     {
         for (int i = 0; i < NumberOfInstantiatedProjectiles; i++)
         {

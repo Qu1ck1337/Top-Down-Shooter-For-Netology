@@ -18,7 +18,7 @@ public class UIAssistant : MonoBehaviour
         if (currentAmmoInStore > 0 || currentAllAmmo > 0)
             _ammoBar.text = currentAmmoInStore.ToString() + "/" + currentAllAmmo.ToString();
         else
-            ResetAmmoBar();
+            _ammoBar.text = "NO AMMO";
     }
 
     public void ResetAmmoBar()

@@ -510,6 +510,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 8225888503605315843, guid: b8115c24bed937649979d43db0a6389e, type: 3}
+      propertyPath: _weapon
+      value: 
+      objectReference: {fileID: 7984772304109819836, guid: 95630c4d102dd4146ac277809a7d7acf, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b8115c24bed937649979d43db0a6389e, type: 3}
 --- !u!1 &355909099
@@ -2902,6 +2906,7 @@ GameObject:
   - component: {fileID: 1741170653}
   - component: {fileID: 1741170652}
   - component: {fileID: 1741170654}
+  - component: {fileID: 1741170655}
   m_Layer: 0
   m_Name: Game Manager
   m_TagString: Untagged
@@ -2962,6 +2967,19 @@ MonoBehaviour:
   _ammoBar: {fileID: 1138424576}
   _scoreBar: {fileID: 1937300990}
   _bonusBar: {fileID: 1169954588}
+--- !u!114 &1741170655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1741170651}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f05eae915d29fc142b0f4f3d7dbe8d61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _soundVolumeSettingsName: VolumeSettings
 --- !u!1 &1767911015
 GameObject:
   m_ObjectHideFlags: 0
