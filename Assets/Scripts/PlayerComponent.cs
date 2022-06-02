@@ -108,7 +108,7 @@ public class PlayerComponent : UnitComponent
     private void OnCollisionEnter(Collision collision)
     {
         if (_weapon != null) return;
-        var weaponComponent = collision.gameObject.GetComponent<SimpleWeapon>();
+        SimpleWeapon weaponComponent = collision.gameObject.GetComponent<SimpleWeapon>();
         if (weaponComponent != null && weaponComponent.Owner == null && weaponComponent.CanBePickedUp)
         {
             _weapon = weaponComponent;

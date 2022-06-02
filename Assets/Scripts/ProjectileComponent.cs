@@ -38,7 +38,7 @@ public class ProjectileComponent : MonoBehaviour
             var blood = Instantiate(_bloodParticles, collision.GetContact(0).point, transform.rotation);
             blood.transform.parent = collision.gameObject.transform;
         }
-        else if (collision.gameObject.isStatic)
+        else if (collision.gameObject.layer == 3)
         {
             transform.position = transform.parent.position;
             _isMoving = false;

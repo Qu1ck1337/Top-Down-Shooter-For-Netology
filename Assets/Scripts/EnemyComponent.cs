@@ -52,10 +52,15 @@ public class EnemyComponent : UnitComponent
     [Space, SerializeField]
     private bool _showGizmos;
 
+    private bool _isMoving = true;
+    private bool _inCooldownByShoting;
+
     public Enums.EnemyStateType StateType { get; private set; } = Enums.EnemyStateType.Idle;
 
-    private void Start()
+    protected override void Awake()
     {
+        base.Awake();
+
         _animator.SetBool("IsBot", true);
         _handTrigger = GetComponentInChildren<SphereCollider>();
 
@@ -77,8 +82,7 @@ public class EnemyComponent : UnitComponent
         }
 
         _agent = GetComponent<NavMeshAgent>();
-        _target = FindObjectOfType<PlayerComponent>().gameObject.transform;
-        _projectilePool = FindObjectOfType<ProjectilePool>();
+
         if (_patrollingPoints.Count > 0)
         {
             _patrollingPoints.Add(transform.position);
@@ -88,8 +92,17 @@ public class EnemyComponent : UnitComponent
         {
             _patrollingPoints.Add(transform.position);
         }
+
     }
 
+    private void Start()
+    {
+        _target = FindObjectOfType<PlayerComponent>().gameObject.transform;
+        _projectilePool = FindObjectOfType<ProjectilePool>();
+    }
+
+    [SerializeField]
+    private bool _test;
     private void Update()
     {
         //        Определяем угол между целью и таргетом черезе Vector3.SignedAngle относительно оси Y
@@ -98,12 +111,11 @@ public class EnemyComponent : UnitComponent
 
         //IK animation для держания оружия
 
-        if (_isDead) return;
-        if (_target == null) return;
-        if (!_isMoving) return;
+        if (_isDead || _target == null) return;
+        UpdateStatus();
+        if (_inCooldownByShoting || !_isMoving) return;
         TargetDetection();
         AttackPlayerLogic();
-        UpdateStatus();
     }
 
     private void FixedUpdate()
@@ -123,7 +135,6 @@ public class EnemyComponent : UnitComponent
         }
     }
 
-    private bool _isMoving = true;
     private void UpdateStatus()
     {
         switch (StateType)
@@ -146,7 +157,7 @@ public class EnemyComponent : UnitComponent
                 break;
             case Enums.EnemyStateType.Shoot:
                 _weapon.checkAndFire();
-                StartCoroutine(StopUnit(_delayTimeAfterFire));
+                StartCoroutine(StopUnitByShooting(_delayTimeAfterFire));
                 break;
             case Enums.EnemyStateType.Punch:
                 if (!_inAnimation) 
@@ -211,21 +222,28 @@ public class EnemyComponent : UnitComponent
         }
     }
 
-        //todo если игрок в зоне видимости, то бот должен бросить луч и проверить есть ли стена
+    //todo если игрок в зоне видимости, то бот должен бросить луч и проверить есть ли стена
 
-        //todo довернуться до игрока, а не ждать луча
+    //todo довернуться до игрока, а не ждать луча
+
+    private IEnumerator StopUnitByShooting(float seconds)
+    {
+        _inCooldownByShoting = true;
+        StateType = Enums.EnemyStateType.Idle;
+        yield return new WaitForSeconds(seconds);
+        _inCooldownByShoting = false;
+    }
 
     private IEnumerator StopUnit(float seconds)
     {
         _isMoving = false;
-        _agent.destination = transform.position;
+        StateType = Enums.EnemyStateType.Idle;
         yield return new WaitForSeconds(seconds);
         _isMoving = true;
     }
 
     public void SetEnemyCooldown(float seconds)
     {
-        StateType = Enums.EnemyStateType.Idle;
         StartCoroutine(StopUnit(seconds));
     }
 

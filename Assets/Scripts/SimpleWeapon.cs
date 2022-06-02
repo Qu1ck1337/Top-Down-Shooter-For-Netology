@@ -154,7 +154,7 @@ public class SimpleWeapon : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.isStatic == true)
+        if (other.gameObject.layer == 3)
         {
             _isFlying = false;
             CanBePickedUp = true;
