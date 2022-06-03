@@ -14,7 +14,7 @@ public class EnemyComponent : UnitComponent
     [SerializeField]
     private float _timeForPlayerPursuitInIdentificationRadius = 2f;
 
-    public float GetPlayerIdentificationRadius => _playerIdentificationRadius;
+    public float PlayerIdentificationRadius => _playerIdentificationRadius;
     [SerializeField, Range(0f, 100f)]
     private float _radiusOfEnemyView;
 
@@ -33,7 +33,6 @@ public class EnemyComponent : UnitComponent
 
     [Space, SerializeField]
     private float _pursuitSpeed;
-
     [SerializeField]
     private float _rotateSpeed;
 
@@ -43,18 +42,18 @@ public class EnemyComponent : UnitComponent
     [Space, SerializeField]
     private bool _canPickUpWeapon;
 
+    [Space, SerializeField]
+    private bool _showGizmos;
+
     //todo угол между таргетом и ботом (+- погрешность)
     private Transform _target;
     private NavMeshAgent _agent;
     private ProjectilePool _projectilePool;
     private bool _isTargetInIdentificationRadius;
-
-    [Space, SerializeField]
-    private bool _showGizmos;
-
     private bool _isMoving = true;
     private bool _inCooldownByShoting;
 
+    public List<EnemyComponent> NearestEnemies = new List<EnemyComponent>();
     public Enums.EnemyStateType StateType { get; private set; } = Enums.EnemyStateType.Idle;
 
     protected override void Awake()
@@ -70,7 +69,7 @@ public class EnemyComponent : UnitComponent
             TransformWeaponToPoint();
             _weapon.Owner = this;
             _distanceToAttack += _weapon.GetRadiusToFire();
-            _weapon.ToggleColliders();
+            _weapon.ToggleColliders(false);
         }
         else if (_randomWeapons.Count != 0)
         {
@@ -78,7 +77,7 @@ public class EnemyComponent : UnitComponent
             TransformWeaponToPoint();
             _weapon.Owner = this;
             _distanceToAttack += _weapon.GetRadiusToFire();
-            _weapon.ToggleColliders();
+            _weapon.ToggleColliders(false);
         }
 
         _agent = GetComponent<NavMeshAgent>();
@@ -222,6 +221,84 @@ public class EnemyComponent : UnitComponent
         }
     }
 
+    public bool EnemyOnPursuit;
+    private void TargetDetection()
+    {
+        var distance = Vector3.Distance(transform.position, _target.position);
+        if (distance < _radiusOfEnemyView)
+        {
+            if (EnemyOnPursuit)
+            {
+                StateType = Enums.EnemyStateType.Pursuit;
+                return;
+            }
+
+            //todo [для оптимизации] кидать луч, если игрок в зоне палева (посмотреть варианты)
+            Physics.Raycast(transform.position, (_target.position - transform.position), out RaycastHit hit);
+            if (hit.collider != null && hit.collider.GetComponent<PlayerComponent>())
+            {
+                //будет продолжать патрулированеие, если игрок зайдёт за стену
+                //if (EnemyOnPursuit)
+                //{
+                //    StateType = Enums.EnemyStateType.Pursuit;
+                //    return;
+                //}
+
+                if (IsAnyBulletsAround())
+                {
+                    StateType = Enums.EnemyStateType.Pursuit;
+                    EnemyOnPursuit = true;
+                    SetAllNearestEnemiesPursuitState();
+                }
+
+                if (distance < _playerIdentificationRadius)
+                {
+                    if (!_isTargetInIdentificationRadius && StateType != Enums.EnemyStateType.Pursuit)
+                    {
+                        _isTargetInIdentificationRadius = true;
+                        StartCoroutine(WaitForTargetStayingInIdentificationRadius());
+                    }
+                }
+                else
+                {
+                    _isTargetInIdentificationRadius = false;
+                }
+            }
+            //будет продолжать патрулированеие, если игрок зайдёт за стену
+            //else if (EnemyOnPursuit)
+            //{
+            //    StateType = Enums.EnemyStateType.Patrolling;
+            //    EnemyOnPursuit = false;
+            //}
+        }
+        else
+        {
+            if (EnemyOnPursuit)
+            {
+                var ind = _currentPartollingPointIndex % _patrollingPoints.Count;
+                if (Vector3.Distance(new Vector3(_patrollingPoints[ind].x, transform.position.y, _patrollingPoints[ind].z), transform.position) >= _stayOnRadiusPatrollingPoint)
+                {
+                    StateType = Enums.EnemyStateType.Patrolling;
+                }
+                else
+                {
+                    StateType = Enums.EnemyStateType.Idle;
+                }
+                EnemyOnPursuit = false;
+            }
+        }
+    }
+
+    private void SetAllNearestEnemiesPursuitState()
+    {
+        foreach (EnemyComponent enemy in NearestEnemies)
+        {
+            Physics.Raycast(transform.position, (enemy.transform.position - transform.position), out RaycastHit hit);
+            if (hit.collider != null && hit.collider.GetComponent<EnemyComponent>())
+                enemy.EnemyOnPursuit = true;
+        }
+    }
+
     //todo если игрок в зоне видимости, то бот должен бросить луч и проверить есть ли стена
 
     //todo довернуться до игрока, а не ждать луча
@@ -247,63 +324,6 @@ public class EnemyComponent : UnitComponent
         StartCoroutine(StopUnit(seconds));
     }
 
-    private bool _isEnemyOnPursuit;
-    private void TargetDetection()
-    {
-        var distance = Vector3.Distance(transform.position, _target.position);
-        if (distance < _radiusOfEnemyView)
-        {
-            if (_isEnemyOnPursuit)
-            {
-                StateType = Enums.EnemyStateType.Pursuit;
-                return;
-            }
-            //todo [для оптимизации] кидать луч, если игрок в зоне палева (посмотреть варианты)
-            Physics.Raycast(transform.position, (_target.position - transform.position), out RaycastHit hit);
-            if (hit.collider != null && hit.collider.GetComponent<PlayerComponent>())
-            {
-                if (IsAnyBulletsAround())
-                {
-                    StateType = Enums.EnemyStateType.Pursuit;
-                    _isEnemyOnPursuit = true;
-                }
-
-                if (distance < _playerIdentificationRadius) 
-                {
-                    if (!_isTargetInIdentificationRadius && StateType != Enums.EnemyStateType.Pursuit)
-                    {
-                        _isTargetInIdentificationRadius = true;
-                        StartCoroutine(WaitForTargetStayingInIdentificationRadius());
-                    }
-                }
-                else
-                {
-                    _isTargetInIdentificationRadius = false;
-                }
-            }
-            else
-            {
-                //StateType = Enums.EnemyStateType.Patrolling;
-            }
-        }
-        else
-        {
-            if (_isEnemyOnPursuit)
-            {
-                var ind = _currentPartollingPointIndex % _patrollingPoints.Count;
-                if (Vector3.Distance(new Vector3(_patrollingPoints[ind].x, transform.position.y, _patrollingPoints[ind].z), transform.position) >= _stayOnRadiusPatrollingPoint)
-                {
-                    StateType = Enums.EnemyStateType.Patrolling;
-                }
-                else
-                {
-                    StateType = Enums.EnemyStateType.Idle;
-                }
-                _isEnemyOnPursuit = false;
-            }
-        }
-    }
-
     private IEnumerator WaitForTargetStayingInIdentificationRadius()
     {
         yield return new WaitForSeconds(_timeForPlayerPursuitInIdentificationRadius);
@@ -313,7 +333,8 @@ public class EnemyComponent : UnitComponent
             if (hit.collider != null && hit.collider.GetComponent<PlayerComponent>() != null)
             {
                 StateType = Enums.EnemyStateType.Pursuit;
-                _isEnemyOnPursuit = true;
+                EnemyOnPursuit = true;
+                SetAllNearestEnemiesPursuitState();
             }
         }
     }
@@ -364,7 +385,7 @@ public class EnemyComponent : UnitComponent
             TransformWeaponToPoint();
             _weapon.transform.rotation = transform.rotation;
             _distanceToAttack += _weapon.GetRadiusToFire();
-            _weapon.ToggleColliders();
+            _weapon.ToggleColliders(false);
         }
     }
 }

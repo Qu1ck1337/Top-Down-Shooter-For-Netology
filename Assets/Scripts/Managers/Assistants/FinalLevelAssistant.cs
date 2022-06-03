@@ -32,6 +32,6 @@ public class FinalLevelAssistant : MonoBehaviour
 
     private void NextLevel(EnemyComponent enemy)
     {
-        _gameManager.LoadNextLevel();
+        _gameManager.SpawnEndLevelTrigger();
     }
 }

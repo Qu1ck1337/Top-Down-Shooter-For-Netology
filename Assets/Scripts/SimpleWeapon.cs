@@ -32,12 +32,9 @@ public class SimpleWeapon : MonoBehaviour
 
     [SerializeField]
     protected int _currentAmmoInStore;
-
     public int CurrentAmmoInStore { get => _currentAmmoInStore; }
 
     public UnitComponent Owner;
-
-    private CapsuleCollider _triggerCollider;
 
     public bool CanBePickedUp { get; private set; }
 
@@ -144,11 +141,11 @@ public class SimpleWeapon : MonoBehaviour
         OnWeaponReloadingEvent?.Invoke();
     }
 
-    public void ToggleColliders()
+    public void ToggleColliders(bool state)
     {
         foreach(Collider collider in _hideCollidersWhenWeaponOnUnit)
         {
-            collider.enabled = !collider.enabled;
+            collider.enabled = state;
         }
     }
 

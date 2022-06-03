@@ -74,7 +74,7 @@ public class UnitComponent : MonoBehaviour
             _weapon.WeaponRigidBody.AddForce(parent.forward * _dropWeaponImpulse);
             _weapon.Owner = null;
             _weapon.SetFlyingTrue();
-            _weapon.ToggleColliders();
+            _weapon.ToggleColliders(true);
             _weapon = null;
         }
     }

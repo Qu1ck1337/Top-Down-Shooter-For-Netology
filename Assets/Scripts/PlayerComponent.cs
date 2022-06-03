@@ -23,7 +23,7 @@ public class PlayerComponent : UnitComponent
             _weapon = Instantiate(_weapon, transform);
             _weapon.Owner = this;
             TransformWeaponToPoint();
-            _weapon.ToggleColliders();
+            _weapon.ToggleColliders(false);
             _weapon.OnWeaponReloadingEvent += ReloadingWeapon;
         }
         _controls.Player.Fire.performed += TouchFire;
@@ -117,7 +117,7 @@ public class PlayerComponent : UnitComponent
             _weapon.transform.parent = transform;
             TransformWeaponToPoint();
             _weapon.transform.rotation = transform.rotation;
-            _weapon.ToggleColliders();
+            _weapon.ToggleColliders(false);
             _weapon.OnWeaponReloadingEvent += ReloadingWeapon;
             OnPlayerActionEvent.Invoke(Enums.PlayerActionType.PickUpWeapon);
         }

@@ -33,13 +33,15 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private int _decreasesToResetBonus = 5;
 
+    [Space, SerializeField]
+    private GameObject _endLevelTrigger;
+
     private FinalLevelAssistant _finalLevelAssistant;
     private int _totalyPlayerScore;
     private PlayerComponent _player;
     private List<EnemyComponent> _enemies = new List<EnemyComponent>();
     private float _bonus;
     private int _enemiesKilledForTime;
-    [SerializeField]
     private float _timer;
     private int _decreases;
     private bool _rampage;
@@ -64,25 +66,31 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        NearestEnemies();
+        EndGameLogic();
+        RampageChecker();
+    }
+
+    private void EndGameLogic()
+    {
         if (_player == null)
         {
             SceneManager.LoadScene(_sceneName);
         }
+
         if (_enemies.Count == 0)
         {
-            if (_rampage && _finalLevelAssistant == null)
-            {
-                _totalyPlayerScore += (int)(_scoreAfterKillEnemy * _enemiesKilledForTime * _bonus);
-            }
-
             CheckBestScores();
 
             if (_finalLevelAssistant != null)
                 OnAllEnemiesDeadEvent?.Invoke();
             else
-                LoadNextLevel();
+                SpawnEndLevelTrigger();
         }
+    }
 
+    private void RampageChecker()
+    {
         if (!_rampage)
         {
             if (_enemiesKilledForTime >= 3 && _timer <= _timeToStartRampage)
@@ -99,6 +107,31 @@ public class GameManager : MonoBehaviour
                 _timer += Time.deltaTime;
             }
         }
+    }
+
+    private void NearestEnemies()
+    {
+        foreach (EnemyComponent enemy in _enemies)
+        {
+            List<EnemyComponent> nearestEnemies = new List<EnemyComponent>();
+            foreach (EnemyComponent checkingEnemy in _enemies)
+            {
+                if (checkingEnemy != enemy && Vector3.Distance(checkingEnemy.transform.position, enemy.transform.position) <= enemy.PlayerIdentificationRadius)
+                {
+                    nearestEnemies.Add(checkingEnemy);
+                }
+            }
+            enemy.NearestEnemies = nearestEnemies;
+        }
+    }
+
+    public void NextLevel()
+    {
+        if (_rampage)
+        {
+            _totalyPlayerScore += (int)(_scoreAfterKillEnemy * _enemiesKilledForTime * _bonus);
+        }
+        SceneManager.LoadScene(_nextSceneName);
     }
 
     private IEnumerator StartRampage()
@@ -131,9 +164,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void LoadNextLevel()
+    public void SpawnEndLevelTrigger()
     {
-        SceneManager.LoadScene(_nextSceneName);
+        _endLevelTrigger.SetActive(true);
     }
 
     private void PlayerAction(Enums.PlayerActionType actionType)

@@ -40,7 +40,7 @@ public class ProjectilePool : MonoBehaviour
         foreach (ProjectileComponent projectile in ProjectileQueuePool)
         {
             var distance = Vector3.Distance(new Vector3(projectile.gameObject.transform.position.x, unit.transform.position.y, projectile.gameObject.transform.position.z), unit.transform.position);
-            if (distance <= unit.GetPlayerIdentificationRadius && distance < nearestDistance)
+            if (distance <= unit.PlayerIdentificationRadius && distance < nearestDistance)
             {
                 nearestDistance = distance;
                 nearestProjectile = projectile;
