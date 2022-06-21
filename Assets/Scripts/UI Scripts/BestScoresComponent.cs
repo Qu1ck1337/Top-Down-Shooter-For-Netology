@@ -18,6 +18,7 @@ public class BestScoresComponent : MonoBehaviour
         {
             if (PlayerPrefs.HasKey(sceneName))
             {
+                if (_text.text == "") _text.text += "Ћучший счЄт \n---------";
                 int score = PlayerPrefs.GetInt(sceneName);
                 _bestScoreLevelsNamesPlaceholders.TryGetValue(sceneName, out string placeholder);
                 _text.text += "\n" + placeholder + ": " + score.ToString();

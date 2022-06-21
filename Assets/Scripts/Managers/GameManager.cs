@@ -7,10 +7,18 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+[RequireComponent(typeof(UIAssistant))]
 public class GameManager : MonoBehaviour
 {
-    [SerializeField]
-    private UIAssistant _uiAssistant;
+    public static GameManager Self;
+
+    [Space, SerializeField]
+    private PlayerComponent _player;
+    public PlayerComponent Player => _player;
+
+    [Space, SerializeField]
+    private ProjectilePool _projectilePool;
+    public ProjectilePool ProjectilePool => _projectilePool;
 
     [Space, SerializeField]
     private string _sceneName;
@@ -36,9 +44,10 @@ public class GameManager : MonoBehaviour
     [Space, SerializeField]
     private GameObject _endLevelTrigger;
 
+    private UIAssistant _uiAssistant;
+    private SoundAssistant _soundAssistant;
     private FinalLevelAssistant _finalLevelAssistant;
     private int _totalyPlayerScore;
-    private PlayerComponent _player;
     private List<EnemyComponent> _enemies = new List<EnemyComponent>();
     private float _bonus;
     private int _enemiesKilledForTime;
@@ -46,11 +55,19 @@ public class GameManager : MonoBehaviour
     private int _decreases;
     private bool _rampage;
 
+    private void Awake()
+    {
+        Self = this;
+    }
+
     private void Start()
     {
-        _player = FindObjectOfType<PlayerComponent>();
         _player.OnPlayerActionEvent += PlayerAction;
+
+        _uiAssistant = GetComponent<UIAssistant>();
         _uiAssistant.SetAmmoBar(_player.PlayerWeapon.CurrentAmmoInStore, _player.PlayerWeapon.CurrentAllAmmo);
+
+        _soundAssistant = GetComponent<SoundAssistant>();
 
         _finalLevelAssistant = GetComponent<FinalLevelAssistant>();
 
@@ -66,7 +83,6 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        NearestEnemies();
         EndGameLogic();
         RampageChecker();
     }
@@ -81,16 +97,20 @@ public class GameManager : MonoBehaviour
         if (_enemies.Count == 0)
         {
             CheckBestScores();
+            StopRampage();
 
             if (_finalLevelAssistant != null)
                 OnAllEnemiesDeadEvent?.Invoke();
             else
+            {
                 SpawnEndLevelTrigger();
+            }
         }
     }
 
     private void RampageChecker()
     {
+        if (_enemies.Count == 0) return;
         if (!_rampage)
         {
             if (_enemiesKilledForTime >= 3 && _timer <= _timeToStartRampage)
@@ -109,20 +129,17 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void NearestEnemies()
+    public List<EnemyComponent> GetNearestEnemies(EnemyComponent selfEnemy)
     {
-        foreach (EnemyComponent enemy in _enemies)
+        List<EnemyComponent> nearestEnemies = new List<EnemyComponent>();
+        foreach (EnemyComponent checkingEnemy in _enemies)
         {
-            List<EnemyComponent> nearestEnemies = new List<EnemyComponent>();
-            foreach (EnemyComponent checkingEnemy in _enemies)
+            if (checkingEnemy != selfEnemy && Vector3.Distance(checkingEnemy.transform.position, selfEnemy.transform.position) <= selfEnemy.PlayerIdentificationRadius)
             {
-                if (checkingEnemy != enemy && Vector3.Distance(checkingEnemy.transform.position, enemy.transform.position) <= enemy.PlayerIdentificationRadius)
-                {
-                    nearestEnemies.Add(checkingEnemy);
-                }
+                nearestEnemies.Add(checkingEnemy);
             }
-            enemy.NearestEnemies = nearestEnemies;
         }
+        return nearestEnemies;
     }
 
     public void NextLevel()
@@ -140,7 +157,9 @@ public class GameManager : MonoBehaviour
         _bonus = _startBonusOnRampage;
         _enemiesKilledForTime = 0;
         _timer = 0f;
+        _uiAssistant.StartRampageStartLabel();
         _uiAssistant.ShowPlayerBonusScore(_bonus);
+        _soundAssistant.RampageLevelSoundtrack();
         while (_rampage)
         {
             yield return new WaitForSeconds(_secondsToDecreaseBonus);
@@ -149,24 +168,33 @@ public class GameManager : MonoBehaviour
             
             if (_decreases >= _decreasesToResetBonus)
             {
-                _rampage = false;
-                _totalyPlayerScore += (int)(_scoreAfterKillEnemy * _enemiesKilledForTime * _bonus);
-                _uiAssistant.ShowPlayerScore(_totalyPlayerScore);
-                _bonus = 1;
-                _enemiesKilledForTime = 0;
-                _decreases = 0;
+                StopRampage();
             }
 
-            if (_rampage)
-                _uiAssistant.ShowPlayerBonusScore(_bonus);
-            else
-                _uiAssistant.ResetPlayerBonusScore();
+            _uiAssistant.ShowPlayerBonusScore(_bonus);
         }
+        _uiAssistant.ResetPlayerBonusScore();
+    }
+
+    private void StopRampage()
+    {
+        if (!_rampage) return;
+        _rampage = false;
+        _totalyPlayerScore += (int)(_scoreAfterKillEnemy * _enemiesKilledForTime * _bonus);
+        _uiAssistant.ShowPlayerScore(_totalyPlayerScore);
+        _uiAssistant.StartRampageEndLabel();
+        _bonus = 1;
+        _enemiesKilledForTime = 0;
+        _decreases = 0;
+        _soundAssistant.CommonLevelSoundtrack();
     }
 
     public void SpawnEndLevelTrigger()
     {
+        if (_endLevelTrigger.activeSelf) return;
         _endLevelTrigger.SetActive(true);
+        _soundAssistant.EndLevelSoundtrack();
+        _uiAssistant.EndLevelLabel();
     }
 
     private void PlayerAction(Enums.PlayerActionType actionType)

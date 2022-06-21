@@ -12,6 +12,14 @@ public class UIAssistant : MonoBehaviour
     private TextMeshProUGUI _scoreBar;
     [SerializeField]
     private TextMeshProUGUI _bonusBar;
+    [SerializeField]
+    private GameObject _rampageLabelStart;
+    [SerializeField]
+    private GameObject _rampageLabelEnd;
+    [SerializeField]
+    private GameObject _comeBackLabel;
+    [SerializeField]
+    private float _rampageLabelStayTime = 1f;
 
     public void SetAmmoBar(int currentAmmoInStore, int currentAllAmmo)
     {
@@ -39,5 +47,34 @@ public class UIAssistant : MonoBehaviour
     public void ResetPlayerBonusScore()
     {
         _bonusBar.text = "";
+    }
+
+    public void StartRampageStartLabel()
+    {
+        StartCoroutine(RampageLabelStartTimer());
+    }
+
+    private IEnumerator RampageLabelStartTimer()
+    {
+        _rampageLabelStart.SetActive(true);
+        yield return new WaitForSeconds(_rampageLabelStayTime);
+        _rampageLabelStart.SetActive(false);
+    }
+
+    public void StartRampageEndLabel()
+    {
+        StartCoroutine(RampageLabelEndTimer());
+    }
+
+    private IEnumerator RampageLabelEndTimer()
+    {
+        _rampageLabelEnd.SetActive(true);
+        yield return new WaitForSeconds(_rampageLabelStayTime);
+        _rampageLabelEnd.SetActive(false);
+    }
+
+    public void EndLevelLabel()
+    {
+        _comeBackLabel.SetActive(true);
     }
 }

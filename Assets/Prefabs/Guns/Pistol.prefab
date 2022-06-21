@@ -158,6 +158,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88e2de21348fa4247b927bd69b92ba24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _spawnWeaponOffsetOnZ: 0.1
   _projectileDelay: 0.3
   _projectileDeviation: 5
   _radiusToFire: 6
@@ -167,8 +168,9 @@ MonoBehaviour:
   _reloadTime: 2
   _currentAllAmmo: 0
   _currentAmmoInStore: 0
-  Owner: {fileID: 0}
   _weaponType: 0
+  _shootSound: {fileID: 8300000, guid: 3701cc7676dd0d14789f2ba5cf3600ab, type: 3}
+  Owner: {fileID: 0}
 --- !u!82 &8618569852602588772
 AudioSource:
   m_ObjectHideFlags: 0
