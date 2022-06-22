@@ -8,6 +8,8 @@ public class DoorComponent : MonoBehaviour
 {
     [SerializeField]
     private GameObject _doorDestroyEffects;
+    [SerializeField]
+    private float _kickForce;
 
     private Rigidbody _rigidbody;
     private bool _isDead;
@@ -24,6 +26,9 @@ public class DoorComponent : MonoBehaviour
         if (collision.gameObject.GetComponent<ProjectileComponent>())
         {
             _isDead = true;
+            _rigidbody.constraints = RigidbodyConstraints.None;
+            _rigidbody.centerOfMass = new Vector3(0, 0, 0); //transform.localScale.y / 2
+            _rigidbody.AddForce(collision.impulse * _kickForce);
             StartCoroutine(DestroyDoor());
         }
     }
@@ -33,6 +38,8 @@ public class DoorComponent : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
         var effects = Instantiate(_doorDestroyEffects);
         effects.transform.position = transform.position;
-        Destroy(gameObject);
+        //GetComponent<Collider>().isTrigger = true;
+        yield return new WaitForSeconds(5f);
+        Destroy(this.gameObject);
     }
 }

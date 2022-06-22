@@ -2270,6 +2270,7 @@ GameObject:
   - component: {fileID: 8225888503605315855}
   - component: {fileID: 8225888503605315843}
   - component: {fileID: 6464165437881001881}
+  - component: {fileID: 5181328615647952621}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -2356,7 +2357,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _animator: {fileID: 5560283330906472291}
-  _health: 100
+  _health: 1
   _movementSpeed: 100
   _weaponSpawn: {x: 0, y: 1.245, z: 0.4}
   _weapon: {fileID: 7984772304109819836, guid: 95630c4d102dd4146ac277809a7d7acf, type: 3}
@@ -2461,3 +2462,15 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &5181328615647952621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7680137615249214652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 052bc747986c4394c802fbed1b3eff15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

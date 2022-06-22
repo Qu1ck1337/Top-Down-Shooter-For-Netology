@@ -25,6 +25,9 @@ public class SoundAssistant : MonoBehaviour
         if (PlayerPrefs.HasKey(_soundVolumeSettingsName))
         {
             float value = PlayerPrefs.GetFloat(_soundVolumeSettingsName);
+            var finalBossAudio = GetComponent<FinalLevelAssistant>()?.getBoss.GetComponent<AudioSource>();  
+            if (finalBossAudio != null)
+                finalBossAudio.volume = finalBossAudio.volume * value;
             AudioSource[] _audioSources = FindObjectsOfType<AudioSource>();
             foreach (AudioSource audio in _audioSources)
             {

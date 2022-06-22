@@ -1063,6 +1063,7 @@ GameObject:
   - component: {fileID: 7528165603432018447}
   - component: {fileID: 7528165603432018445}
   - component: {fileID: 460414596204312785}
+  - component: {fileID: 4524289364705371375}
   m_Layer: 0
   m_Name: Final Boss
   m_TagString: Untagged
@@ -1158,7 +1159,7 @@ MonoBehaviour:
   _stayOnRadiusPatrollingPoint: 2
   _delayStayingOnPoint: 3
   _delayStayingOnPointOffset: 1.5
-  _pursuitSpeed: 7.5
+  _pursuitSpeed: 10
   _rotateSpeed: 500
   _distanceToAttack: 2
   _canPickUpWeapon: 0
@@ -1290,6 +1291,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &4524289364705371375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7528165603432018442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 052bc747986c4394c802fbed1b3eff15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7528166595484667646
 GameObject:
   m_ObjectHideFlags: 0

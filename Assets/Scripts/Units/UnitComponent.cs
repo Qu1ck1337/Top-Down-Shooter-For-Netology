@@ -19,6 +19,7 @@ public class UnitComponent : MonoBehaviour
     protected Vector3 _weaponSpawn;
     [SerializeField]
     protected SimpleWeapon _weapon;
+    public SimpleWeapon getWeapon => _weapon;
     [SerializeField]
     private float _dropWeaponImpulse = 100f;
     [SerializeField]
@@ -34,31 +35,40 @@ public class UnitComponent : MonoBehaviour
     protected Rigidbody _rigidBody;
     protected SphereCollider _handTrigger;
 
+    public event System.Action<EnemyComponent> OnUnitDeadEvent;
+    public event System.Action<SimpleWeapon> OnWeaponChanged;
+
     protected virtual void Awake()
     {
         _audioSource = GetComponent<AudioSource>();
         _rigidBody = GetComponent<Rigidbody>();
     }
 
-    //todo
-    public delegate void UnitDeadEventHandler(EnemyComponent enemy);
-    public event UnitDeadEventHandler OnUnitDeadEvent;
-
     public void ReduceHealthAndKill(int reduce)
     {
-        _health -= reduce;
+        ReduceHealth(reduce);
         if (_health == 0)
         {
-            _animator.SetTrigger("IsDying");
-            OnUnitDeadEvent?.Invoke((EnemyComponent)this);
-            if (GetComponent<NavMeshAgent>() != null)
-                Destroy(GetComponent<NavMeshAgent>());
-            if (_weapon != null)
-                DropWeapon();
-            Destroy(GetComponent<Collider>());
-            _rigidBody.isKinematic = true;
-            _audioSource.PlayOneShot(_dyingSound);
+            Dead();
         }
+    }
+
+    private void ReduceHealth(int reduce) 
+    {
+        _health -= reduce;
+        if (_health > 0 && _health - reduce < 0)
+            _health = 0;
+    }
+
+    protected virtual void Dead()
+    {
+        _animator.SetTrigger("IsDying");
+        OnUnitDeadEvent?.Invoke((EnemyComponent)this);
+        if (_weapon != null)
+            DropWeapon();
+        Destroy(GetComponent<Collider>());
+        _rigidBody.isKinematic = true;
+        _audioSource.PlayOneShot(_dyingSound);
     }
 
     protected void SpawnWeapon(SimpleWeapon weapon)
@@ -86,6 +96,7 @@ public class UnitComponent : MonoBehaviour
             _weapon.SetFlyingTrue();
             _weapon.ToggleColliders(true);
             _weapon = null;
+            OnWeaponChanged?.Invoke(_weapon);
         }
     }
 
@@ -99,6 +110,7 @@ public class UnitComponent : MonoBehaviour
         _weapon.transform.localPosition = _weaponSpawn + new Vector3(0f, 0f, _weapon.spawnWeaponOffsetOnZ);
         _weapon.transform.rotation = transform.rotation;
         _weapon.ToggleColliders(false);
+        OnWeaponChanged?.Invoke(_weapon);
         return true;
     }
 

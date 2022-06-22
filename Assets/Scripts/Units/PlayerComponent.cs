@@ -79,8 +79,7 @@ public class PlayerComponent : UnitComponent
         Gizmos.DrawLine(transform.position, transform.forward * 10);
     }
 
-    public delegate void PlayerActionEventHandler(Enums.PlayerActionType actionType);
-    public event PlayerActionEventHandler OnPlayerActionEvent;
+    public event Action<Enums.PlayerActionType> OnPlayerActionEvent;
 
     private void TouchFire(InputAction.CallbackContext context)
     {
@@ -119,6 +118,12 @@ public class PlayerComponent : UnitComponent
         _weapon.OnWeaponReloadingEvent -= ReloadingWeapon;
         base.DropWeapon();
         OnPlayerActionEvent.Invoke(Enums.PlayerActionType.DropWeapon);
+    }
+
+    protected override void Dead()
+    {
+        base.Dead();
+        _controls.Disable();
     }
 
     private void OnDisable()

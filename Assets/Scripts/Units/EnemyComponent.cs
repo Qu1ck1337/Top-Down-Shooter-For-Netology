@@ -366,4 +366,11 @@ public class EnemyComponent : UnitComponent
         if (!PickUpWeapon(weaponComponent)) return;
         _distanceToAttack += _weapon.GetRadiusToFire;
     }
+
+    protected override void Dead()
+    {
+        base.Dead();
+        if (_agent != null)
+            Destroy(_agent);
+    }
 }

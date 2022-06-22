@@ -1188,6 +1188,7 @@ GameObject:
   - component: {fileID: 3596571239870946697}
   - component: {fileID: 3596571239870946699}
   - component: {fileID: -8965332840745344794}
+  - component: {fileID: 3870312804050064268}
   m_Layer: 0
   m_Name: Weakling Enemy
   m_TagString: Untagged
@@ -1283,7 +1284,7 @@ MonoBehaviour:
   _stayOnRadiusPatrollingPoint: 2
   _delayStayingOnPoint: 3
   _delayStayingOnPointOffset: 1.5
-  _pursuitSpeed: 7.5
+  _pursuitSpeed: 5
   _rotateSpeed: 500
   _distanceToAttack: 2
   _canPickUpWeapon: 1
@@ -1415,6 +1416,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &3870312804050064268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3596571239870946700}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 052bc747986c4394c802fbed1b3eff15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3596572249136996728
 GameObject:
   m_ObjectHideFlags: 0

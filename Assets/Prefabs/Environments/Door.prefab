@@ -62,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d0913aaa1abdf014c81f960ae1108eb1, type: 2}
+  - {fileID: 2100000, guid: 8505c679a93e43e4980cfd457e71d27e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -126,3 +126,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _doorDestroyEffects: {fileID: 8464058464975913142, guid: 450698fa9a7eea34e9a54cd98f5f06fa, type: 3}
+  _kickForce: -10000

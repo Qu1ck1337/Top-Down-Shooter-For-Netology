@@ -9,6 +9,7 @@ public class FinalLevelAssistant : MonoBehaviour
 
     [SerializeField]
     private EnemyComponent _boss;
+    public EnemyComponent getBoss => _boss;
 
     private bool _bossActionStarted;
     private GameManager _gameManager;

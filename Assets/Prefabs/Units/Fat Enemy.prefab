@@ -634,6 +634,7 @@ GameObject:
   - component: {fileID: 6801732113834532185}
   - component: {fileID: 6801732113834532187}
   - component: {fileID: -9152453562058075655}
+  - component: {fileID: 3413833327641078530}
   m_Layer: 0
   m_Name: Fat Enemy
   m_TagString: Untagged
@@ -729,7 +730,7 @@ MonoBehaviour:
   _stayOnRadiusPatrollingPoint: 2
   _delayStayingOnPoint: 3
   _delayStayingOnPointOffset: 1.5
-  _pursuitSpeed: 5
+  _pursuitSpeed: 7.5
   _rotateSpeed: 500
   _distanceToAttack: 2
   _canPickUpWeapon: 0
@@ -861,6 +862,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &3413833327641078530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6801732113834532188}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 052bc747986c4394c802fbed1b3eff15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6801737987776065228
 GameObject:
   m_ObjectHideFlags: 0
