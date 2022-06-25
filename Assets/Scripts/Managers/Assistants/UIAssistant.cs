@@ -26,12 +26,12 @@ public class UIAssistant : MonoBehaviour
         if (currentAmmoInStore > 0 || currentAllAmmo > 0)
             _ammoBar.text = currentAmmoInStore.ToString() + "/" + currentAllAmmo.ToString();
         else
-            _ammoBar.text = "NO AMMO";
+            _ammoBar.text = "Õ≈“ œ¿“–ŒÕŒ¬";
     }
 
     public void ResetAmmoBar()
     {
-        _ammoBar.text = "NO WEAPON";
+        _ammoBar.text = "Õ≈“ Œ–”∆»ﬂ";
     }
 
     public void ShowPlayerScore(int score)

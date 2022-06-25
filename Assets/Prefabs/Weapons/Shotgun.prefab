@@ -141,6 +141,7 @@ MonoBehaviour:
   _currentAmmoInStore: 0
   _weaponType: 2
   _shootSound: {fileID: 8300000, guid: c69579b133348fb4f9dad0daeb63640e, type: 3}
+  _reloadingSound: {fileID: 8300000, guid: 58a426e6b9940d34f9d94845f3e64e52, type: 3}
   Owner: {fileID: 0}
 --- !u!65 &1709589545789641505
 BoxCollider:

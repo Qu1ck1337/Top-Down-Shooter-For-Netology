@@ -170,6 +170,7 @@ MonoBehaviour:
   _currentAmmoInStore: 0
   _weaponType: 0
   _shootSound: {fileID: 8300000, guid: 3701cc7676dd0d14789f2ba5cf3600ab, type: 3}
+  _reloadingSound: {fileID: 8300000, guid: 58a426e6b9940d34f9d94845f3e64e52, type: 3}
   Owner: {fileID: 0}
 --- !u!82 &8618569852602588772
 AudioSource:

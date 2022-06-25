@@ -38,11 +38,13 @@ public class SimpleWeapon : MonoBehaviour
     public Enums.WeaponType GetWeaponType => _weaponType;
     [SerializeField]
     private AudioClip _shootSound;
+    [SerializeField]
+    private AudioClip _reloadingSound;
 
     private bool _isFlying;
     public void SetFlyingTrue() => _isFlying = true;
     private Collider[] _hideCollidersWhenWeaponOnUnit;
-    private AudioSource _shootAudioSource;
+    private AudioSource _audioSource;
     private ParticleSystem _fireParticles;
 
     protected Rigidbody _rigidBody;
@@ -55,6 +57,8 @@ public class SimpleWeapon : MonoBehaviour
     public bool CanBePickedUp { get; private set; }
     public UnitComponent Owner;
 
+    private Coroutine _reloadingState;
+
     private void Awake()
     {
         _weaponType = Enums.WeaponType.Rifle;
@@ -63,7 +67,8 @@ public class SimpleWeapon : MonoBehaviour
         _currentAmmoInStore = _ammoInStore;
         _projectilePool = FindObjectOfType<ProjectilePool>();
         _hideCollidersWhenWeaponOnUnit = GetComponents<Collider>();
-        _shootAudioSource = GetComponent<AudioSource>();
+        _audioSource = GetComponent<AudioSource>();
+        _audioSource.clip = _reloadingSound;
         _fireParticles = GetComponentInChildren<ParticleSystem>();
     }
 
@@ -72,6 +77,14 @@ public class SimpleWeapon : MonoBehaviour
         if (Owner != null)
         {
             CanBePickedUp = false;
+            if (!_isReloading)
+                BulletsCheck();
+        }
+        else if (_reloadingState != null)
+        {
+            StopCoroutine(_reloadingState);
+            _isReloading = false;
+            _audioSource.Stop();
         }
 
         if (_isShootState == false)
@@ -91,9 +104,9 @@ public class SimpleWeapon : MonoBehaviour
         {
             _isShootState = false;
             Fire();
-            BulletsCheck();
-            if (_shootAudioSource != null)
-                _shootAudioSource.PlayOneShot(_shootSound);
+            //BulletsCheck();
+            if (_audioSource != null)
+                _audioSource.PlayOneShot(_shootSound);
             if (_fireParticles != null)
                 _fireParticles.Play();
         }
@@ -114,7 +127,8 @@ public class SimpleWeapon : MonoBehaviour
     {
         if (_currentAmmoInStore <= 0 && _currentAllAmmo > 0)
         {
-            StartCoroutine(Reload());
+            _reloadingState = StartCoroutine(Reload());
+            _audioSource.PlayDelayed(_reloadTime - _reloadingSound.length);
         }
     }
 
