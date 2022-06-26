@@ -20,7 +20,7 @@ public class SoundAssistant : MonoBehaviour
     private void Start()
     {
         _cameraAudioSource = FindObjectOfType<Camera>().gameObject.GetComponent<AudioSource>();
-        CommonLevelSoundtrack();
+        ChangeSoundtrack(SoundtrackType.CommonLevelSoundtrack);
 
         if (PlayerPrefs.HasKey(_soundVolumeSettingsName))
         {
@@ -55,21 +55,33 @@ public class SoundAssistant : MonoBehaviour
         }
     }
 
-    public void CommonLevelSoundtrack()
+    public void SetSoundtrack(AudioClip soundtrack)
     {
-        _cameraAudioSource.clip = _commonLevelSoundtrack;
+        _cameraAudioSource.clip = soundtrack;
         _cameraAudioSource.Play();
     }
 
-    public void RampageLevelSoundtrack()
+    public void ChangeSoundtrack(SoundtrackType type)
     {
-        _cameraAudioSource.clip = _rampageLevelSoundtrack;
+        switch (type)
+        {
+            case SoundtrackType.CommonLevelSoundtrack:
+                _cameraAudioSource.clip = _commonLevelSoundtrack;
+                break;
+            case SoundtrackType.RampageLevelSoundtrack:
+                _cameraAudioSource.clip = _rampageLevelSoundtrack;
+                break;
+            case SoundtrackType.EndLevelSoundtrack:
+                _cameraAudioSource.clip = _endLevelSoundtrack;
+                break;
+        }
         _cameraAudioSource.Play();
     }
 
-    public void EndLevelSoundtrack()
+    public enum SoundtrackType : byte
     {
-        _cameraAudioSource.clip = _endLevelSoundtrack;
-        _cameraAudioSource.Play();
+        CommonLevelSoundtrack,
+        RampageLevelSoundtrack,
+        EndLevelSoundtrack
     }
 }

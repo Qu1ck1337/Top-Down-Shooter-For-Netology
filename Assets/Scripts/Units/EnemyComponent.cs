@@ -23,7 +23,7 @@ public class EnemyComponent : UnitComponent
     private List<Vector3> _patrollingPoints = new List<Vector3>();
     private int _currentPartollingPointIndex;
     [SerializeField]
-    private float _stayOnRadiusPatrollingPoint;
+    private float _stayOnRadiusPatrollingPointRange;
     [SerializeField]
     private float _delayStayingOnPoint;
     [SerializeField]
@@ -134,7 +134,7 @@ public class EnemyComponent : UnitComponent
                 _agent.speed = _movementSpeed;
                 var ind = _currentPartollingPointIndex % _patrollingPoints.Count;
                 _agent.destination = _patrollingPoints[ind];
-                if (Vector3.Distance(new Vector3(_patrollingPoints[ind].x, transform.position.y, _patrollingPoints[ind].z), transform.position) < _stayOnRadiusPatrollingPoint)
+                if (Vector3.Distance(new Vector3(_patrollingPoints[ind].x, transform.position.y, _patrollingPoints[ind].z), transform.position) < _stayOnRadiusPatrollingPointRange)
                 {
                     StartCoroutine(ChangePatrollingPoint());
                 }
@@ -264,7 +264,7 @@ public class EnemyComponent : UnitComponent
             if (EnemyOnPursuit)
             {
                 var ind = _currentPartollingPointIndex % _patrollingPoints.Count;
-                if (Vector3.Distance(new Vector3(_patrollingPoints[ind].x, transform.position.y, _patrollingPoints[ind].z), transform.position) >= _stayOnRadiusPatrollingPoint)
+                if (Vector3.Distance(new Vector3(_patrollingPoints[ind].x, transform.position.y, _patrollingPoints[ind].z), transform.position) >= _stayOnRadiusPatrollingPointRange)
                 {
                     StateType = Enums.EnemyStateType.Patrolling;
                 }

@@ -46,6 +46,7 @@ public class SimpleWeapon : MonoBehaviour
     private Collider[] _hideCollidersWhenWeaponOnUnit;
     private AudioSource _audioSource;
     private ParticleSystem _fireParticles;
+    private Coroutine _reloadingState;
 
     protected Rigidbody _rigidBody;
     public Rigidbody WeaponRigidBody => _rigidBody;
@@ -56,8 +57,6 @@ public class SimpleWeapon : MonoBehaviour
 
     public bool CanBePickedUp { get; private set; }
     public UnitComponent Owner;
-
-    private Coroutine _reloadingState;
 
     private void Awake()
     {

@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(UIAssistant))]
+[RequireComponent(typeof(SoundAssistant))]
 public class GameManager : MonoBehaviour
 {
     public static GameManager Self;
@@ -159,7 +160,7 @@ public class GameManager : MonoBehaviour
         _timer = 0f;
         _uiAssistant.StartRampageStartLabel();
         _uiAssistant.ShowPlayerBonusScore(_bonus);
-        _soundAssistant.RampageLevelSoundtrack();
+        _soundAssistant.ChangeSoundtrack(SoundAssistant.SoundtrackType.RampageLevelSoundtrack);
         while (_rampage)
         {
             yield return new WaitForSeconds(_secondsToDecreaseBonus);
@@ -186,14 +187,14 @@ public class GameManager : MonoBehaviour
         _bonus = 1;
         _enemiesKilledForTime = 0;
         _decreases = 0;
-        _soundAssistant.CommonLevelSoundtrack();
+        _soundAssistant.ChangeSoundtrack(SoundAssistant.SoundtrackType.CommonLevelSoundtrack);
     }
 
     public void SpawnEndLevelTrigger()
     {
         if (_endLevelTrigger.activeSelf) return;
         _endLevelTrigger.SetActive(true);
-        _soundAssistant.EndLevelSoundtrack();
+        _soundAssistant.ChangeSoundtrack(SoundAssistant.SoundtrackType.EndLevelSoundtrack);
         _uiAssistant.EndLevelLabel();
     }
 

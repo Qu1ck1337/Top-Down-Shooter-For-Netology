@@ -2357,7 +2357,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _animator: {fileID: 5560283330906472291}
-  _health: 100
+  _health: 1
   _movementSpeed: 100
   _weaponSpawn: {x: 0, y: 1.245, z: 0.4}
   _weapon: {fileID: 7984772304109819836, guid: 95630c4d102dd4146ac277809a7d7acf, type: 3}
